@@ -1,6 +1,6 @@
-package blif2xnf.naming;
+package xsynth.naming;
 
-class Global implements Name {
+public class GlobalName extends Name {
 	private static final String BASE32 = "0123456789ABCDEFGHJKMNPRSTUVWXYZ";
 	private static final String SUBSTITUTE = "-_[<]>";
 	private static final String KEEP = "/$";
@@ -17,9 +17,8 @@ class Global implements Name {
 
 	private final String mangled;
 	private final String qualified;
-	private String xnf;
 
-	Global(final String name) {
+	GlobalName(final String name) {
 		boolean digitsOnly = true;
 		int bits = 0, accum = 0;
 		final StringBuilder mangled = new StringBuilder();
@@ -106,11 +105,24 @@ class Global implements Name {
 	}
 
 	@Override
-	public String getXnf() {
-		return xnf;
+	public int hashCode() {
+		return qualified.hashCode();
 	}
 
-	String setXnf(final String xnf) {
-		return this.xnf = xnf;
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final GlobalName other = (GlobalName) obj;
+		return qualified.equals(other.qualified);
+	}
+
+	@Override
+	public String toString() {
+		return "GlobalName[" + mangled + "]";
 	}
 }

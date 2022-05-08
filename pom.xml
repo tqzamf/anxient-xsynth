@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tyqz</groupId>
-	<artifactId>blif2xnf</artifactId>
+	<artifactId>xsynth</artifactId>
 	<version>0.0.1</version>
-	<name>blif2xnf</name>
+	<name>XSynth</name>
 	<description>BLIF to XNF converter</description>
 
 	<properties>
