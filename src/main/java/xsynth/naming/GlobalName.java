@@ -1,6 +1,6 @@
 package xsynth.naming;
 
-public class GlobalName extends Name {
+class GlobalName extends Name {
 	private static final String BASE32 = "0123456789ABCDEFGHJKMNPRSTUVWXYZ";
 	private static final String SUBSTITUTE = "-_[<]>";
 	private static final String KEEP = "/$";

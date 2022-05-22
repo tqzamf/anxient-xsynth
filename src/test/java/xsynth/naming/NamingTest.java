@@ -42,9 +42,9 @@ public class NamingTest {
 	@Test
 	public void testQualifiedNames() {
 		final Names names = new Names(false);
-		final GlobalName a = names.getGlobal("test$");
-		final GlobalName b = names.getGlobal("Test~");
-		final GlobalName c = names.getGlobal("TEST");
+		final Name a = names.getGlobal("test$");
+		final Name b = names.getGlobal("Test~");
+		final Name c = names.getGlobal("TEST");
 		final Name d = names.getAnonymous(a, "AND");
 		final Name e = names.getAnonymous(a, "AND");
 		final Name f = names.getAnonymous(a, "AND");
@@ -72,9 +72,9 @@ public class NamingTest {
 	@Test
 	public void testQualifiedNameCollision() {
 		final Names names = new Names(false);
-		final GlobalName a = names.getGlobal("TEST");
-		final GlobalName b = names.getGlobal("TEST/IPAD");
-		final GlobalName c = names.getGlobal("TEST/IPAD1");
+		final Name a = names.getGlobal("TEST");
+		final Name b = names.getGlobal("TEST/IPAD");
+		final Name c = names.getGlobal("TEST/IPAD1");
 		final Name d = names.getAnonymous(a, "IPAD");
 		final Name e = names.getAnonymous(a, "OPAD");
 		names.resolve();
@@ -89,9 +89,9 @@ public class NamingTest {
 	@Test
 	public void testSpecialNameCollision() {
 		final Names names = new Names(false);
-		final GlobalName a = names.getGlobal("VCC");
-		final GlobalName b = names.getGlobal("GND");
-		final GlobalName c = names.getGlobal("GND_1");
+		final Name a = names.getGlobal("VCC");
+		final Name b = names.getGlobal("GND");
+		final Name c = names.getGlobal("GND_1");
 		final Name d = names.getSpecial(SpecialName.VCC);
 		final Name e = names.getSpecial(SpecialName.VCC);
 		final Name f = names.getSpecial(SpecialName.GND);

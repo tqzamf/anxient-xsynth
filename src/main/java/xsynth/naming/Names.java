@@ -17,13 +17,13 @@ public class Names {
 		this.qualifyAllNames = qualifyAllNames;
 	}
 
-	public GlobalName getGlobal(final String name) {
+	public Name getGlobal(final String name) {
 		if (!globals.containsKey(name))
 			globals.put(name, new GlobalName(name));
 		return globals.get(name);
 	}
 
-	public AnonymousName getAnonymous(final GlobalName base, final String qualifier) {
+	public Name getAnonymous(final Name base, final String qualifier) {
 		final AnonymousName name = new AnonymousName(base, qualifier);
 		derived.add(name);
 		return name;
