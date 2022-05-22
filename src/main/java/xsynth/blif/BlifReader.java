@@ -12,16 +12,24 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import xsynth.Diagnostics;
+import xsynth.Diagnostics.AbortedException;
+import xsynth.SourceLocation;
+
 public class BlifReader implements AutoCloseable {
 	private final BufferedReader in;
+	private final String filename;
 	private int nextPhysLine;
 	private int logLine;
+	private final Diagnostics diag;
 
-	public BlifReader(final String filename) throws FileNotFoundException {
-		this(new FileInputStream(filename));
+	public BlifReader(final Diagnostics diag, final String filename) throws FileNotFoundException {
+		this(diag, new FileInputStream(filename), filename);
 	}
 
-	public BlifReader(final InputStream in) {
+	public BlifReader(final Diagnostics diag, final InputStream in, final String filename) {
+		this.diag = diag;
+		this.filename = filename;
 		this.in = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 		nextPhysLine = 1;
 	}
@@ -34,7 +42,7 @@ public class BlifReader implements AutoCloseable {
 		return line;
 	}
 
-	public List<String> nextLine() throws IOException {
+	public List<String> nextLine() throws IOException, AbortedException {
 		final StringBuilder buffer = new StringBuilder();
 		while (true) {
 			logLine = nextPhysLine;
@@ -42,19 +50,22 @@ public class BlifReader implements AutoCloseable {
 
 			while (true) {
 				final String line = readLine();
-				if (line == null)
-					if (buffer.length() == 0)
-						return null;
-					else
-						throw new IllegalArgumentException("unexpected EOF");
+				if (line == null) {
+					if (buffer.length() != 0)
+						throw diag.error(getCurrentLocation(), null, "line continued beyond end of file");
+					return null;
+				}
 
 				final int comment = line.indexOf('#');
 				if (comment >= 0) {
+					if (line.charAt(line.length() - 1) == '\\' // .foo # comment \\
+							|| comment > 0 && line.charAt(comment - 1) == '\\') // .foo \\# comment
+						diag.warn(getCurrentLocation(), null, "cannot continue a comment line");
 					buffer.append(line.substring(0, comment));
 					break; // cannot continue a comment line
-				} else if (line.isEmpty() || line.charAt(line.length() - 1) != '\\') {
+				} else if (!line.endsWith("\\")) {
 					buffer.append(line);
-					break; // line could be continued but isn't
+					break; // logical line ends here
 				} else // line ends with backslash, ie. continued line
 					buffer.append(line.substring(0, line.length() - 1));
 			}
@@ -73,8 +84,12 @@ public class BlifReader implements AutoCloseable {
 		}
 	}
 
-	public int getLineNumber() {
-		return logLine;
+	/**
+	 * @return {@link SourceLocation} of the last line returned by
+	 *         {@link #nextLine()}
+	 */
+	public SourceLocation getCurrentLocation() {
+		return new SourceLocation(filename, logLine);
 	}
 
 	@Override
