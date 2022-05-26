@@ -113,20 +113,14 @@ public class BlifReaderTest {
 		// comment lines cannot be extended with a backslash. because this is probably
 		// not what we wanted, that's a warning
 		assertNextLine(1, ".model", "simple");
-		diag.assertNumWarnings(1);
-		diag.assertNumInfos(0);
-		diag.assertNumErrors(0);
+		diag.assertNumMessages(1, 0, 0);
 		// lines cannot be extended by a backslash directly before comment either
 		assertNextLine(2, ".names", "foo", "bar", "baz\\");
-		diag.assertNumWarnings(2);
-		diag.assertNumInfos(0);
-		diag.assertNumErrors(0);
+		diag.assertNumMessages(2, 0, 0);
 		// the must not have been swallowed by the preceeding comment line
 		assertNextLine(4, ".end");
 		assertNull(reader.nextLine());
-		diag.assertNumWarnings(2);
-		diag.assertNumInfos(0);
-		diag.assertNumErrors(0);
+		diag.assertNumMessages(2, 0, 0);
 	}
 
 	@Test
@@ -135,9 +129,7 @@ public class BlifReaderTest {
 				".model\\", // 2
 				" simple\\"); // 3
 		assertThrows(AbortedException.class, reader::nextLine);
-		diag.assertNumErrors(1);
-		diag.assertNumWarnings(0);
-		diag.assertNumInfos(0);
+		diag.assertNumMessages(1, 0, 0);
 	}
 
 	private void createReader(final String... strings) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public class Names {
 		// design, so they have to be easily identifiable
 		final Map<String, List<GlobalName>> collisions = new HashMap<>();
 		for (final GlobalName name : globals.values()) {
-			final String canon = name.getMangled().toLowerCase();
+			final String canon = name.getMangled().toLowerCase(Locale.ROOT);
 			if (!collisions.containsKey(canon))
 				collisions.put(canon, new ArrayList<>());
 			collisions.get(canon).add(name);

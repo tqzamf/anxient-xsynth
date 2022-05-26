@@ -12,6 +12,7 @@ public class DiagnosticsShim extends Diagnostics {
 	@Override
 	protected void print(final String level, final SourceLocation sloc, final List<String> line, final String message) {
 		messages.add(message);
+		System.out.println(sloc + "- " + message);
 	}
 
 	@Override
@@ -27,27 +28,18 @@ public class DiagnosticsShim extends Diagnostics {
 	}
 
 	@Override
-	public AbortedException error(final SourceLocation sloc, final List<String> line, final String message)
-			throws AbortedException {
+	public AbortedException error(final SourceLocation sloc, final List<String> line, final String message) {
 		nError++;
 		return super.error(sloc, line, message);
 	}
 
+	public void assertNumMessages(final int errors, final int warnings, final int infos) {
+		assertEquals(errors, nError);
+		assertEquals(warnings, nWarn);
+		assertEquals(infos, nInfo);
+	}
+
 	public void assertNoMessages() {
-		assertNumInfos(0);
-		assertNumWarnings(0);
-		assertNumErrors(0);
-	}
-
-	public void assertNumInfos(final int expected) {
-		assertEquals(expected, nInfo);
-	}
-
-	public void assertNumWarnings(final int expected) {
-		assertEquals(expected, nWarn);
-	}
-
-	public void assertNumErrors(final int expected) {
-		assertEquals(expected, nError);
+		assertNumMessages(0, 0, 0);
 	}
 }

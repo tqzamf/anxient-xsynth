@@ -52,7 +52,7 @@ public class BlifReader implements AutoCloseable {
 				final String line = readLine();
 				if (line == null) {
 					if (buffer.length() != 0)
-						throw diag.error(getCurrentLocation(), null, "line continued beyond end of file");
+						throw diag.error(getCurrentLocation(), "line continued beyond end of file");
 					return null;
 				}
 
@@ -60,7 +60,7 @@ public class BlifReader implements AutoCloseable {
 				if (comment >= 0) {
 					if (line.charAt(line.length() - 1) == '\\' // .foo # comment \\
 							|| comment > 0 && line.charAt(comment - 1) == '\\') // .foo \\# comment
-						diag.warn(getCurrentLocation(), null, "cannot continue a comment line");
+						diag.warn(getCurrentLocation(), "cannot continue a comment line");
 					buffer.append(line.substring(0, comment));
 					break; // cannot continue a comment line
 				} else if (!line.endsWith("\\")) {
