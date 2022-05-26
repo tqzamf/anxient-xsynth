@@ -211,7 +211,7 @@ public class BlifParser {
 		case ".pad" -> { // proprietary
 			if (line.size() < 2)
 				throw diag.error(sloc, line, "illegal .pad declaration");
-			final String pad = line.get(1);
+			final String pad = line.get(1).toUpperCase(Locale.ROOT);
 			yield parseCustomGate(sloc, customGates.get(CustomGateFactory.IOPAD_GATE), pad, line);
 		}
 
@@ -236,11 +236,15 @@ public class BlifParser {
 				if (flags.contains(flag))
 					diag.info(sloc, "duplicate flag " + flag);
 				flags.add(flag);
-				break;
+				continue;
 			}
 
 			final String pin = decl.substring(0, eq).toLowerCase(Locale.ROOT);
 			final String signal = decl.substring(eq + 1);
+			if (pin.isEmpty())
+				err = diag.error(sloc, "missing pin name");
+			if (signal.isEmpty())
+				err = diag.error(sloc, "missing signal name for pin " + pin);
 			final String existingConnection = inputs.containsKey(pin) ? inputs.get(pin) : outputs.get(pin);
 			if (existingConnection != null)
 				err = diag.error(sloc, "duplicate connection: gate pin " + pin + " connects to both " + signal + " and "

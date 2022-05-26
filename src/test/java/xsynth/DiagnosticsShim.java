@@ -12,7 +12,6 @@ public class DiagnosticsShim extends Diagnostics {
 	@Override
 	protected void print(final String level, final SourceLocation sloc, final List<String> line, final String message) {
 		messages.add(message);
-		System.out.println(sloc + "- " + message);
 	}
 
 	@Override
