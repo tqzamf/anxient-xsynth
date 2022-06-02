@@ -18,7 +18,11 @@ class GlobalName extends Name {
 	private final String mangled;
 	private final String qualified;
 
-	GlobalName(final String name) {
+	GlobalName() {
+		mangled = qualified = null;
+	}
+
+	GlobalName(final String name, final boolean replaceSlashes) {
 		boolean digitsOnly = true;
 		int bits = 0, accum = 0;
 		final StringBuilder mangled = new StringBuilder();
@@ -48,7 +52,10 @@ class GlobalName extends Name {
 				// hierarchy separator. arguably, each hierarchy level could be mangled
 				// separately. then again, tgt-blif probably only uses / for networks that
 				// implement the LPM_* macros.
-				mangled.append(ch);
+				// for namespaces, slashes are replaced by dashes. this it the general strategy
+				// that namespaces use to avoid conflicting with signals, and greatly simplifies
+				// the logic handling them.
+				mangled.append(replaceSlashes ? '-' : '/');
 				digitsOnly = false;
 			} else if (ch == '$') {
 				// an actual dollar sign. rare, but legal in unescaped verilog. because there

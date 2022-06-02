@@ -7,8 +7,8 @@ public abstract class Name {
 		return xnf;
 	}
 
-	protected String setXnf(final String xnf) {
-		return this.xnf = xnf;
+	protected void setXnf(final String xnf) {
+		this.xnf = xnf;
 	}
 
 	@Override

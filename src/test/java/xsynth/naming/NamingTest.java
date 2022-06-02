@@ -2,13 +2,15 @@ package xsynth.naming;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 public class NamingTest {
 	@Test
 	public void testUniqueGlobalNames() {
-		final Names names = new Names(false);
+		final Namespace names = new Namespace(false);
 		final Name a = names.getGlobal("test$");
 		final Name b = names.getGlobal("Test-");
 		final Name c = names.getGlobal("foo");
@@ -26,7 +28,7 @@ public class NamingTest {
 
 	@Test
 	public void testCollidingGlobalNames() {
-		final Names names = new Names(false);
+		final Namespace names = new Namespace(false);
 		final Name a = names.getGlobal("test$");
 		final Name b = names.getGlobal("Test~");
 		final Name c = names.getGlobal("foo");
@@ -41,7 +43,7 @@ public class NamingTest {
 
 	@Test
 	public void testQualifiedNames() {
-		final Names names = new Names(false);
+		final Namespace names = new Namespace(false);
 		final Name a = names.getGlobal("test$");
 		final Name b = names.getGlobal("Test~");
 		final Name c = names.getGlobal("TEST");
@@ -71,7 +73,7 @@ public class NamingTest {
 
 	@Test
 	public void testQualifiedNameCollision() {
-		final Names names = new Names(false);
+		final Namespace names = new Namespace(false);
 		final Name a = names.getGlobal("TEST");
 		final Name b = names.getGlobal("TEST/IPAD");
 		final Name c = names.getGlobal("TEST/IPAD1");
@@ -88,7 +90,7 @@ public class NamingTest {
 
 	@Test
 	public void testSpecialNameCollision() {
-		final Names names = new Names(false);
+		final Namespace names = new Namespace(false);
 		final Name a = names.getGlobal("VCC");
 		final Name b = names.getGlobal("GND");
 		final Name c = names.getGlobal("GND_1");
@@ -112,5 +114,57 @@ public class NamingTest {
 		// VCC), the special nets get their "official" name
 		assertEquals("GCLK", g.getXnf());
 		assertEquals("MD1", h.getXnf());
+	}
+
+	@Test
+	public void testHierarchicalNames() {
+		final Namespace root = new Namespace(false);
+		final Namespace foo = root.getNamespace("foo");
+		final Namespace bar = foo.getNamespace("bar");
+		final Namespace baz = bar.getNamespace("baz");
+		final Namespace bay = root.getNamespace("bay");
+		final Namespace bar1 = foo.getNamespace("b/a/r");
+		final Namespace bar2 = foo.getNamespace("b/a");
+		final Namespace bar3 = foo.getNamespace("b-a");
+		final Namespace bar4 = foo.getNamespace("b-A");
+		final Name a = root.getGlobal("bay");
+		final Name b = root.getGlobal("bar");
+		final Name c = bar.getGlobal("baz/c");
+		final Name d = baz.getGlobal("d");
+		final Name e = bar1.getGlobal("f");
+		final Name f = bar2.getGlobal("r/f");
+		final Name g = bar3.getGlobal("r/f");
+		final Name h = bar4.getGlobal("r/f");
+		final Name vcc1 = foo.getSpecial(SpecialName.VCC);
+		final Name vcc2 = bay.getSpecial(SpecialName.VCC);
+		root.resolve();
+		// namespaces "make way" for signal names
+		assertEquals("bay", a.getXnf());
+		assertEquals("bay-1", bay.getXnf());
+		// and they are hierarchical, using "/" as the hierarchy separator
+		assertEquals("foo", foo.getXnf());
+		assertEquals("foo/bar", bar.getXnf());
+		// a prefix is enough to rename the namespace
+		assertEquals("foo/bar/baz/c", c.getXnf());
+		assertEquals("foo/bar/baz-1", baz.getXnf());
+		assertEquals("foo/bar/baz-1/d", d.getXnf());
+		// names don't conflict between hierarchy levels
+		assertEquals("bar", b.getXnf());
+		// namespace names can themselves contain slashes, but they're replaced by
+		// dashes for simplicity. in the example, that avoids a conflict for foo/b/a/r/f
+		assertNotEquals(e.getXnf(), f.getXnf());
+		assertEquals("foo/b-a-r/f", e.getXnf());
+		assertEquals("foo/b-a/r/f", f.getXnf());
+		assertEquals("foo/b-a-r", bar1.getXnf());
+		assertEquals("foo/b-a", bar2.getXnf());
+		// namespaces use the same "qualify if non-unique" strategy as signal names
+		assertEquals("foo/b_a-0", bar3.getXnf());
+		assertEquals("foo/b_A-4", bar4.getXnf());
+		assertEquals("foo/b_a-0/r/f", g.getXnf());
+		assertEquals("foo/b_A-4/r/f", h.getXnf());
+		// special nets are always created in the top namespace
+		assertSame(vcc1, vcc2);
+		assertTrue(root.hasSpecial(SpecialName.VCC));
+		assertSame(vcc1, root.getSpecial(SpecialName.VCC));
 	}
 }

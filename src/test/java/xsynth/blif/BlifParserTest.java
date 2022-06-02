@@ -362,7 +362,7 @@ public class BlifParserTest {
 		try (ByteArrayInputStream data = new ByteArrayInputStream(
 				String.join("\n", lines).getBytes(StandardCharsets.UTF_8))) {
 			final BlifParser parser = new BlifParser(diag, Map.of());
-			model = parser.parse(data, "test.blif");
+			model = parser.parse(data, "/opt/xsynth/test.blif");
 			return parser.getModels();
 		}
 	}

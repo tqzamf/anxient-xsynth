@@ -133,7 +133,7 @@ public class BlifParser {
 	}
 
 	private String getImplicitModelName(final SourceLocation sloc) {
-		final String filename = sloc.getFilename().replaceFirst("(?i)\\.bli?f$", "");
+		final String filename = sloc.getFilename().replaceFirst("(?i)\\.bli?f$", "").replaceFirst(".*[\\/]", "");
 		if (nModels == 0) {
 			// primary model is unnamed, specified to be implicitly named after the
 			// filename. the primary model can actually be referenced reliably using this
