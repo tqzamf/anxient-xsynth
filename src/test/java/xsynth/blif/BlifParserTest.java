@@ -46,9 +46,9 @@ public class BlifParserTest {
 		assertNotNull(model);
 		assertEquals("foo", model.getName());
 		// clocks are implicitly inputs
-		assertEquals(Set.of("a", "b", "c", "g", "h"), model.getDeclaredInputs());
-		assertEquals(Set.of("d", "e", "f"), model.getDeclaredOutputs());
-		assertEquals(Set.of("g", "h"), model.getDeclaredClocks());
+		assertEquals(Set.of("a", "b", "c", "g", "h"), model.getInputs());
+		assertEquals(Set.of("d", "e", "f"), model.getOutputs());
+		assertEquals(Set.of("g", "h"), model.getClocks());
 		assertEquals(Map.of(), model.getBuffers());
 		diag.assertNoMessages();
 
@@ -56,9 +56,9 @@ public class BlifParserTest {
 		parse(".model foo", ".inputs", ".clock clk", ".buffer bufg");
 		assertNotNull(model);
 		assertEquals("foo", model.getName());
-		assertEquals(Set.of("clk"), model.getDeclaredInputs());
-		assertEquals(Set.of(), model.getDeclaredOutputs());
-		assertEquals(Set.of("clk"), model.getDeclaredClocks());
+		assertEquals(Set.of("clk"), model.getInputs());
+		assertEquals(Set.of(), model.getOutputs());
+		assertEquals(Set.of("clk"), model.getClocks());
 		// an empty list of buffers is actually very useful for declaring that the
 		// clocks are *not* meant to be implicitly buffered
 		assertEquals(Map.of("bufg", Set.of()), model.getBuffers());
@@ -69,9 +69,9 @@ public class BlifParserTest {
 		parse(".model foo", ".inputs clk klc", ".clock clk kcl", ".buffer bufg clk");
 		assertNotNull(model);
 		assertEquals("foo", model.getName());
-		assertEquals(Set.of("clk", "klc", "kcl"), model.getDeclaredInputs());
-		assertEquals(Set.of(), model.getDeclaredOutputs());
-		assertEquals(Set.of("clk", "kcl"), model.getDeclaredClocks());
+		assertEquals(Set.of("clk", "klc", "kcl"), model.getInputs());
+		assertEquals(Set.of(), model.getOutputs());
+		assertEquals(Set.of("clk", "kcl"), model.getClocks());
 		// this is incidentially an example of bufg use: it makes the clk clock
 		// buffered, but not the kcl clock
 		assertEquals(Map.of("bufg", Set.of("clk")), model.getBuffers());
@@ -100,9 +100,9 @@ public class BlifParserTest {
 		assertEquals("baz", baz.getName());
 
 		for (final BlifModel model : List.of(foo, bar, baz)) {
-			assertEquals(Set.of(), model.getDeclaredInputs());
-			assertEquals(Set.of(), model.getDeclaredOutputs());
-			assertEquals(Set.of(), model.getDeclaredClocks());
+			assertEquals(Set.of(), model.getInputs());
+			assertEquals(Set.of(), model.getOutputs());
+			assertEquals(Set.of(), model.getClocks());
 			assertEquals(Map.of(), model.getBuffers());
 		}
 		diag.assertNoMessages();
@@ -332,6 +332,47 @@ public class BlifParserTest {
 		assertParseDiagnostics(1, 0, 0, ".model test", ".latch in out re clk 3", ".names in1 in2 out", "11 1");
 		// maybe test duplicate inputs; these have to work just find
 		assertParseDiagnostics(0, 0, 0, ".model test", ".latch in out1 re clk 3", ".names in in out2", "11 1");
+		// .clock cannot be driven by the model itself
+		assertParseDiagnostics(1, 0, 0, ".model test", ".clock out", ".names out");
+	}
+
+	@Test
+	public void testInferredIO() throws IOException, AbortedException {
+		// if input or output omitted, it is inferred from the signals that are
+		// "missing" ie. not used by the circuit
+		parse(".model test", ".latch in out re clk 3", ".names a b c d e");
+		assertEquals(Set.of("in", "clk", "a", "b", "c", "d"), model.getInputs());
+		assertEquals(Set.of("out", "e"), model.getOutputs());
+		assertEquals(Set.of(), model.getClocks()); // clock isn't inferred
+		diag.assertNoMessages();
+
+		// slightly more complicated case where where not just every single signal is an
+		// input or output. (this model doesn't actually have outputs, but neither does
+		// the toplevel circuit if all signals are tied to .pad's)
+		parse(".model test", ".latch in out re clk 3", ".names out x y in");
+		assertEquals(Set.of("clk", "x", "y"), model.getInputs());
+		assertEquals(Set.of(), model.getOutputs());
+		assertEquals(Set.of(), model.getClocks());
+		diag.assertNoMessages();
+
+		// if only the clock is specified, then that clock becomes an input, but the
+		// inputs and outputs are still inferred properly
+		parse(".model test", ".clock clk", ".latch in out re clk 3", ".names a b c d e");
+		assertEquals(Set.of("in", "clk", "a", "b", "c", "d"), model.getInputs());
+		assertEquals(Set.of("out", "e"), model.getOutputs());
+		assertEquals(Set.of("clk"), model.getClocks());
+		diag.assertNoMessages();
+
+		// if inputs specify a subset, a warning is generated per pin, and the pin is
+		// pulled low. if a pin is specified as a clock, that is treated as an input and
+		// thus doesn't give the warning.
+		// if outputs specify a subset, only an INFO message is generated (a single one
+		// listing all unused outputs)
+		parse(".model test", ".inputs a b c", ".outputs e", ".clock clk", ".latch in out re clk 3", ".names a b c d e");
+		assertEquals(Set.of("a", "b", "c", "clk"), model.getInputs());
+		assertEquals(Set.of("e"), model.getOutputs());
+		assertEquals(Set.of("clk"), model.getClocks());
+		diag.assertNumMessages(0, 2, 1);
 	}
 
 	private void assertParseDiagnostics(final int errors, final int warnings, final int infos, final String... lines) {

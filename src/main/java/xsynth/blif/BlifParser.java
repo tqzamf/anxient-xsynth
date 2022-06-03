@@ -52,6 +52,8 @@ public class BlifParser {
 			}
 			if (primaryModel == null && err == null) // don't put that after syntax errors
 				err = diag.error(reader.getCurrentLocation(), "file doesn't contain any models");
+			for (final BlifModel model : models.values())
+				model.inferIO(diag);
 			if (err != null)
 				throw err;
 			return primaryModel;
