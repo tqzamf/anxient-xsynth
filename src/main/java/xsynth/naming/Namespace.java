@@ -1,12 +1,15 @@
 package xsynth.naming;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Namespace extends GlobalName {
 	private final Map<String, SpecialName> specials;
@@ -15,22 +18,28 @@ public class Namespace extends GlobalName {
 	private final Map<String, Namespace> namespaces = new HashMap<>();
 	private final boolean qualifyAllNames;
 	private final Namespace parent;
+	private final Map<String, String> ports;
 
 	public Namespace(final boolean qualifyAllNames) {
 		super();
 		this.qualifyAllNames = qualifyAllNames;
 		specials = new HashMap<>();
 		parent = null;
+		ports = Map.of();
 	}
 
-	public Namespace(final Namespace parent, final String name) {
+	Namespace(final Namespace parent, final String name, final Map<String, String> ports) {
 		super(name, true);
+		this.ports = ports;
 		qualifyAllNames = parent.qualifyAllNames;
 		specials = null;
 		this.parent = parent;
 	}
 
 	public Name getGlobal(final String name) {
+		if (ports.containsKey(name))
+			return parent.getGlobal(ports.get(name));
+
 		if (!globals.containsKey(name))
 			globals.put(name, new GlobalName(name, false));
 		return globals.get(name);
@@ -60,9 +69,13 @@ public class Namespace extends GlobalName {
 		return specials.containsKey(name);
 	}
 
-	public Namespace getNamespace(final String name) {
+	public Namespace getNamespace(final String name, final Collection<String> ports) {
+		return getNamespace(name, ports.stream().collect(Collectors.toMap(Function.identity(), Function.identity())));
+	}
+
+	public Namespace getNamespace(final String name, final Map<String, String> ports) {
 		if (!namespaces.containsKey(name))
-			namespaces.put(name, new Namespace(this, name));
+			namespaces.put(name, new Namespace(this, name, ports));
 		return namespaces.get(name);
 	}
 
