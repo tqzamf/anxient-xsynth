@@ -8,7 +8,8 @@ class AnonymousName extends Numbered {
 	private final Name base;
 	private final String qualifier;
 
-	AnonymousName(final Name base, final String qualifier) {
+	AnonymousName(final Namespace ns, final Name base, final String qualifier) {
+		super(ns);
 		if (base == null)
 			throw new NullPointerException("base name is null");
 		if (qualifier == null)

@@ -44,7 +44,12 @@ public class XnfWriter implements AutoCloseable {
 		final Map<String, String> params = new HashMap<>(gate.getParams());
 		params.put("LIBVER", "2.0.0");
 		writeRecord(RecordType.SYM, params, gate.getName().getXnf(), gate.getType());
-		writePins(gate.getPins());
+		for (final XnfPin pin : gate.getPins()) {
+			final Map<String, String> params1 = pin.getParams();
+			if (pin.isInvert())
+				params1.put("INV", null);
+			writeRecord(RecordType.PIN, params1, pin.getPin(), pin.getDir().getCode(), pin.getSignal().getXnf(), "");
+		}
 		writeRecord(RecordType.END, Map.of());
 	}
 
@@ -53,16 +58,7 @@ public class XnfWriter implements AutoCloseable {
 		for (final String flag : pad.getFlags())
 			params.put(flag, null);
 		params.put("LOC", pad.getLoc());
-		writeRecord(RecordType.EXT, params, pad.getName().getXnf(), pad.getType().getCode(), "");
-	}
-
-	private void writePins(final List<XnfPin> pins) throws IOException {
-		for (final XnfPin pin : pins) {
-			final Map<String, String> params = pin.getParams();
-			if (pin.isInvert())
-				params.put("INV", null);
-			writeRecord(RecordType.PIN, params, pin.getPin(), pin.getDir().getCode(), pin.getSignal().getXnf(), "");
-		}
+		writeRecord(RecordType.EXT, params, pad.getSignal().getXnf(), pad.getType().getCode(), "");
 	}
 
 	private void writeRecord(final RecordType record, final Map<String, String> params, final String... fields)

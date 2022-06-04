@@ -19,7 +19,7 @@ PIN,I,I,enable/PAD,
 PIN,O,O,enable,
 END
 EXT,output/PAD,O,,LOC=P3,FAST
-SYM,output/BUF,OBUF,LIBVER=2.0.0
+SYM,output/PAD,OBUF,LIBVER=2.0.0
 PIN,I,I,output,
 PIN,O,O,output/PAD,
 END

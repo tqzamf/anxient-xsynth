@@ -14,7 +14,8 @@ public class SpecialName extends Numbered {
 
 	private final String name;
 
-	SpecialName(final String name) {
+	SpecialName(final Namespace ns, final String name) {
+		super(ns);
 		if (!NAME.matcher(name).matches())
 			throw new IllegalArgumentException("illegal name " + name);
 		this.name = name;

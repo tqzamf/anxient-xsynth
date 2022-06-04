@@ -51,12 +51,12 @@ public class NamingTest {
 		final Name a = names.getGlobal("test$");
 		final Name b = names.getGlobal("Test~");
 		final Name c = names.getGlobal("TEST");
-		final Name d = names.getAnonymous(a, "AND");
-		final Name e = names.getAnonymous(a, "AND");
-		final Name f = names.getAnonymous(a, "AND");
-		final Name g = names.getAnonymous(b, "OR");
-		final Name h = names.getAnonymous(b, "IPAD");
-		final Name i = names.getAnonymous(c, "IPAD");
+		final Name d = a.getAnonymous("AND");
+		final Name e = a.getAnonymous("AND");
+		final Name f = a.getAnonymous("AND");
+		final Name g = b.getAnonymous("OR");
+		final Name h = b.getAnonymous("IPAD");
+		final Name i = c.getAnonymous("IPAD");
 		names.resolve();
 		// anonymous names use the qualified form of the global name they're based on
 		assertEquals("test$-1G", a.getXnf());
@@ -81,8 +81,8 @@ public class NamingTest {
 		final Name a = names.getGlobal("TEST");
 		final Name b = names.getGlobal("TEST/IPAD");
 		final Name c = names.getGlobal("TEST/IPAD1");
-		final Name d = names.getAnonymous(a, "IPAD");
-		final Name e = names.getAnonymous(a, "OPAD");
+		final Name d = a.getAnonymous("IPAD");
+		final Name e = a.getAnonymous("OPAD");
 		names.resolve();
 		// anonymous names simply increment if they collide with a global name
 		assertEquals("TEST", a.getXnf());

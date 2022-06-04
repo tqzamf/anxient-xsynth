@@ -7,14 +7,13 @@ import java.util.Map;
 
 import xsynth.naming.Name;
 
-public class XnfGate  {
+public class XnfGate {
 	private final List<XnfPin> pins = new ArrayList<>();
-	private final Name name;
 	private final Map<String, String> params;
 	private final String type;
+	private Name name;
 
-	public XnfGate(final String type, final Name name, final Map<String, String> params) {
-		this.name = name;
+	public XnfGate(final String type, final Map<String, String> params) {
 		this.params = new HashMap<>(params != null ? params : Map.of());
 		this.type = type;
 	}
@@ -25,7 +24,19 @@ public class XnfGate  {
 	}
 
 	public Name getName() {
+		if (name == null)
+			name = computeName();
 		return name;
+	}
+
+	private Name computeName() {
+		// derive block name from the net it drives
+		for (final XnfPin pin : pins)
+			if (pin.getDir() == PinDirection.DRIVER)
+				return pin.getSignal();
+		// in the rare case that a block doesn't drive anything (basically only RDCLK
+		// and the special output pads), use a name derived from its first input
+		return pins.get(0).getSignal().getAnonymous("SYM");
 	}
 
 	public Map<String, String> getParams() {

@@ -19,10 +19,12 @@ class GlobalName extends Name {
 	private final String qualified;
 
 	GlobalName() {
+		super(null);
 		mangled = qualified = null;
 	}
 
-	GlobalName(final String name, final boolean replaceSlashes) {
+	GlobalName(final Namespace ns, final String name, final boolean replaceSlashes) {
+		super(ns);
 		boolean digitsOnly = true;
 		int bits = 0, accum = 0;
 		final StringBuilder mangled = new StringBuilder();

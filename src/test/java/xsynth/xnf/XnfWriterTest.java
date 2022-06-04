@@ -26,48 +26,45 @@ public class XnfWriterTest {
 			final Namespace ns = new Namespace(false);
 			final Name feedback = ns.getGlobal("feedback");
 			final Name enable = ns.getGlobal("enable");
-			final Name enablePad = ns.getAnonymous(enable, "PAD");
+			final Name enablePad = enable.getAnonymous("PAD");
 			final Name output = ns.getGlobal("output");
-			final Name outputPad = ns.getAnonymous(output, "PAD");
-			final Name outputBuf = ns.getAnonymous(output, "BUF");
+			final Name outputPad = output.getAnonymous("PAD");
 			final Name clock = ns.getGlobal("clock");
-			final Name clockOsc = ns.getAnonymous(clock, "OSC");
+			final Name clockOsc = clock.getAnonymous("OSC");
 			final Name logic1 = ns.getSpecial(SpecialName.VCC);
 			ns.resolve();
 
 			xnf.writeHeader(ns, "3030pc84-70", List.of("--testcase"));
 
-			final XnfGate and = new XnfGate("AND", feedback, null);
+			final XnfGate and = new XnfGate("AND", null);
 			and.connect(PinDirection.CONSUMER, "I0", true, output, null);
 			and.connect(PinDirection.CONSUMER, "I1", false, enable, null);
 			and.connect(PinDirection.CONSUMER, "I2", false, logic1, null);
 			and.connect(PinDirection.DRIVER, "O", false, feedback, null);
 			xnf.writeSymbol(and);
 
-			final XnfGate ff = new XnfGate("DFF", output, null);
+			final XnfGate ff = new XnfGate("DFF", null);
 			ff.connect(PinDirection.CONSUMER, "D", false, feedback, null);
 			ff.connect(PinDirection.CONSUMER, "C", false, clock, null);
 			ff.connect(PinDirection.DRIVER, "Q", false, output, null);
 			xnf.writeSymbol(ff);
 
-			final XnfPad enpad = new XnfPad(PadType.OUTPUT, enablePad, "P2", null, null);
-			xnf.writePad(enpad);
-			final XnfGate enbuf = new XnfGate("IBUF", enable, null);
+			xnf.writePad(new XnfPad(PadType.OUTPUT, enablePad, "P2", null, null));
+			final XnfGate enbuf = new XnfGate("IBUF", null);
 			enbuf.connect(PinDirection.CONSUMER, "I", false, enablePad, null);
 			enbuf.connect(PinDirection.DRIVER, "O", false, enable, null);
 			xnf.writeSymbol(enbuf);
 
-			final XnfPad outpad = new XnfPad(PadType.OUTPUT, outputPad, "P3", null, List.of("FAST"));
-			xnf.writePad(outpad);
-			final XnfGate outbuf = new XnfGate("OBUF", outputBuf, null);
+			xnf.writePad(new XnfPad(PadType.OUTPUT, outputPad, "P3", null, List.of("FAST")));
+			final XnfGate outbuf = new XnfGate("OBUF", null);
 			outbuf.connect(PinDirection.CONSUMER, "I", false, output, null);
 			outbuf.connect(PinDirection.DRIVER, "O", false, outputPad, null);
 			xnf.writeSymbol(outbuf);
 
-			final XnfGate osc = new XnfGate("OSC", clockOsc, null);
+			final XnfGate osc = new XnfGate("OSC", null);
 			osc.connect(PinDirection.DRIVER, "O", false, clockOsc, null);
 			xnf.writeSymbol(osc);
-			final XnfGate abuf = new XnfGate("ACLK", clock, null);
+			final XnfGate abuf = new XnfGate("ACLK", null);
 			abuf.connect(PinDirection.CONSUMER, "I", false, clockOsc, null);
 			abuf.connect(PinDirection.DRIVER, "O", false, clock, null);
 			xnf.writeSymbol(abuf);
@@ -98,11 +95,11 @@ public class XnfWriterTest {
 		for (final String expected : lines) {
 			assertTrue(i < xnf.length, "EOF in file, expecting " + expected);
 			final String actual = xnf[i].replaceAll("\\s+,\\s+", ",");
+			i++;
 			if (expected.startsWith("PROG,")) // contains version + date, which are dynamic
 				assertTrue(actual.startsWith("PROG,"), "line " + i);
 			else
 				assertEquals(expected, actual, "line " + i);
-			i++;
 		}
 		if (xnf.length > i)
 			fail("expecting EOF, found line " + xnf[i]);

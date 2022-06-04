@@ -29,7 +29,7 @@ public class Namespace extends GlobalName {
 	}
 
 	Namespace(final Namespace parent, final String name, final Map<String, String> ports) {
-		super(name, true);
+		super(parent, name, true);
 		this.ports = ports;
 		qualifyAllNames = parent.qualifyAllNames;
 		specials = null;
@@ -41,12 +41,12 @@ public class Namespace extends GlobalName {
 			return parent.getGlobal(ports.get(name));
 
 		if (!globals.containsKey(name))
-			globals.put(name, new GlobalName(name, false));
+			globals.put(name, new GlobalName(this, name, false));
 		return globals.get(name);
 	}
 
-	public Name getAnonymous(final Name base, final String qualifier) {
-		final AnonymousName name = new AnonymousName(base, qualifier);
+	Name getAnonymous(final Name base, final String qualifier) {
+		final AnonymousName name = new AnonymousName(this, base, qualifier);
 		derived.add(name);
 		return name;
 	}
@@ -56,7 +56,7 @@ public class Namespace extends GlobalName {
 			return parent.getSpecial(name);
 
 		if (!specials.containsKey(name)) {
-			final SpecialName net = new SpecialName(name);
+			final SpecialName net = new SpecialName(this, name);
 			specials.put(name, net);
 			derived.add(net);
 		}
