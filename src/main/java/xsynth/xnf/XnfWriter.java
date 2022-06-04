@@ -61,6 +61,13 @@ public class XnfWriter implements AutoCloseable {
 		writeRecord(RecordType.EXT, params, pad.getSignal().getXnf(), pad.getType().getCode(), "");
 	}
 
+	public void writeNetlist(final XnfNetlist netlist) throws IOException {
+		for (final XnfGate gate : netlist.getGates())
+			writeSymbol(gate);
+		for (final XnfPad pad : netlist.getPads())
+			writePad(pad);
+	}
+
 	private void writeRecord(final RecordType record, final Map<String, String> params, final String... fields)
 			throws IOException {
 		final StringBuilder buffer = new StringBuilder(record.name());

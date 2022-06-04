@@ -1,0 +1,24 @@
+LCANET,6
+PROG,xsynth,0.0.1,"2022-06-05 01:19:28 --testcase"
+PART,3030pc84-70
+SYM,re,DFF,INIT=R,LIBVER=2.0.0
+PIN,C,I,clock
+PIN,D,I,data1
+PIN,Q,O,re
+END
+SYM,fe,DFF,INIT=S,LIBVER=2.0.0
+PIN,C,I,clock,,INV
+PIN,D,I,data2
+PIN,Q,O,fe
+END
+SYM,ah,DLAT,INIT=S,LIBVER=2.0.0
+PIN,G,I,clock
+PIN,D,I,data1
+PIN,Q,O,ah
+END
+SYM,al,DLAT,INIT=R,LIBVER=2.0.0
+PIN,G,I,clock,,INV
+PIN,D,I,data2
+PIN,Q,O,al
+END
+EOF
