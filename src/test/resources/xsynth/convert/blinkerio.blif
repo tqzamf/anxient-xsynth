@@ -1,0 +1,10 @@
+.buffer bufg clock
+.pad P1 i=clock
+.pad P2 i=sel[0]
+.pad P3 i=sel[1]
+.pad P4 o=led_static[0] t=led_static[0]
+.pad P5 o=led_static[1] t=led_static[1]
+.pad P6 o=led_static[2] t=led_static[2]
+.pad P8 o=led[0]
+.pad P9 o=led[1]
+.pad P10 o=led[2]

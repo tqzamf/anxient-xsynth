@@ -1,0 +1,5 @@
+.model latches
+.latch in ff_rising re clock 0
+.latch in ff_falling fe clock 1 
+.latch in latch_active_high ah clock 2 
+.latch in latch_active_low al clock 3

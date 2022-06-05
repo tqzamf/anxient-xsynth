@@ -1,0 +1,8 @@
+.model pads2k
+.pad p1 i=input
+.pad p2 o=output
+.pad p3 t=tristate
+.pad p4 o=trisoutput t=tristate
+.pad p5 i=bidinput o=bidoutput
+.pad p6 i=trisinput t=odtristate
+.pad p7 i=odinput o=opendrain t=opendrain

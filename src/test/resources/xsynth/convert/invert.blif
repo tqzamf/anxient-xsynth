@@ -1,0 +1,25 @@
+.model inversions # boundary cases using inversion
+
+.names in invertout/singleboth
+1 0
+.names in invertin/singleboth
+0 1
+.names in invertboth/singleboth
+0 0
+
+.names in invertout/singleand
+1 0
+0 1
+.names in invertin/singleand
+0 1
+1 1
+.names in invertboth/singleand
+0 0
+1 0
+
+.names in inner invertout/singleor
+11 0
+.names in inner invertin/singleor
+01 1
+.names in inner invertboth/singleor
+01 0

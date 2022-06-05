@@ -1,0 +1,18 @@
+LCANET,6
+PROG,xsynth,0.0.1,"converted and exhaustively checked (ie. checked at all, given the underwhelming complexity)"
+PART,xc3030avg100-7
+PWR,0,GND
+PWR,1,VCC
+SYM,logic0/method1,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,logic0/method1
+END
+SYM,logic0/method2,INV,LIBVER=2.0.0
+PIN,I,I,VCC
+PIN,O,O,logic0/method2
+END
+SYM,logic1,BUF,LIBVER=2.0.0
+PIN,I,I,VCC
+PIN,O,O,logic1
+END
+EOF

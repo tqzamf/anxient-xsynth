@@ -1,0 +1,6 @@
+.model constants
+.names logic0/method1
+.names logic0/method2
+0
+.names logic1
+1

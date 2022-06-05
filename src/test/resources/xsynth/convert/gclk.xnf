@@ -1,0 +1,13 @@
+LCANET,6
+PROG,xsynth,0.0.1,"verified to make sense"
+PART,xc3030avg100-7
+SYM,out,DFF,LIBVER=2.0.0
+PIN,C,I,GCLK
+PIN,D,I,in
+PIN,Q,O,out
+END
+SYM,GCLK,BUF,LIBVER=2.0.0
+PIN,I,I,clock
+PIN,O,O,GCLK
+END
+EOF

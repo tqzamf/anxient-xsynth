@@ -1,0 +1,22 @@
+.model sum-of-products
+.names in1 in2 normal
+10 1
+01 1
+
+# boundary cases with 1 term:
+.names in1 in2 singleor
+11 1
+.names in1 in2 singleand
+-1 1
+1- 1
+.names in1 singleboth
+1 1
+
+# boundary case with no AND term:
+.names in1 in2 emptyand
+-1 1
+-- 1
+.names in1 in2 emptyand_singleor
+-- 1
+# the corresponding "emptyor" is logic0/method1 in constants.blif
+# and "emptyboth" is obviously the same as "emptyor"
