@@ -29,5 +29,5 @@ PIN,I,I,clock/OSC
 PIN,O,O,clock
 END
 EXT,enable/PAD,I,,LOC=P2
-EXT,output/PAD,O,,LOC=P3,FAST
+EXT,output/PAD,O,,FAST,LOC=P3
 EOF

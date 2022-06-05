@@ -1,7 +1,7 @@
 package xsynth.xnf;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +17,7 @@ public class XnfPad {
 	public XnfPad(final PadType type, final Name signal, final String loc, final Map<String, String> params,
 			final List<String> flags) {
 		this.signal = signal;
-		this.params = new HashMap<>(params != null ? params : Map.of());
+		this.params = new LinkedHashMap<>(params != null ? params : Map.of());
 		this.type = type;
 		this.loc = loc;
 		this.flags = new ArrayList<>(flags != null ? flags : List.of());

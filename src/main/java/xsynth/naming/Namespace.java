@@ -2,8 +2,8 @@ package xsynth.naming;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 public class Namespace extends GlobalName {
 	private final Map<String, SpecialName> specials;
-	private final Map<String, GlobalName> globals = new HashMap<>();
+	private final Map<String, GlobalName> globals = new LinkedHashMap<>();
 	private final List<Numbered> derived = new ArrayList<>();
-	private final Map<String, Namespace> namespaces = new HashMap<>();
+	private final Map<String, Namespace> namespaces = new LinkedHashMap<>();
 	private final boolean qualifyAllNames;
 	private final Namespace parent;
 	private final Map<String, String> ports;
@@ -23,7 +23,7 @@ public class Namespace extends GlobalName {
 	public Namespace(final boolean qualifyAllNames) {
 		super();
 		this.qualifyAllNames = qualifyAllNames;
-		specials = new HashMap<>();
+		specials = new LinkedHashMap<>();
 		parent = null;
 		ports = Map.of();
 	}
@@ -138,7 +138,7 @@ public class Namespace extends GlobalName {
 		// unqualified (original) names are kept unmodified if they're case-
 		// insensitively unique. they're directly from the user-specified Verilog
 		// design, so they have to be easily identifiable
-		final Map<String, List<GlobalName>> collisions = new HashMap<>();
+		final Map<String, List<GlobalName>> collisions = new LinkedHashMap<>();
 		for (final GlobalName name : values) {
 			final String canon = name.getMangled().toLowerCase(Locale.ROOT);
 			if (!collisions.containsKey(canon))

@@ -35,7 +35,7 @@ public class XnfNetlist {
 	public void addLogicGate(final String type, final Name output, final boolean invertOutput,
 			final List<Term> inputs) {
 		if (inputs.size() <= 1)
-			throw new IllegalArgumentException("too few inputs: " + inputs);
+			throw new IllegalArgumentException("too few inputs for " + type + " gate " + output + ": " + inputs);
 
 		// algorithm: create a gate and try to cram all inputs into that gate. if they
 		// don't fit, wire its output to a temporary net and append that net to the end

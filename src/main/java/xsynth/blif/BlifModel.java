@@ -1,8 +1,8 @@
 package xsynth.blif;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,9 +12,9 @@ import xsynth.Diagnostics.AbortedException;
 import xsynth.SourceLocation;
 
 public class BlifModel {
-	private final Map<String, String> buffers = new HashMap<>();
-	private final Map<String, List<BlifGate>> consumers = new HashMap<>();
-	private final Map<String, BlifGate> driver = new HashMap<>();
+	private final Map<String, String> buffers = new LinkedHashMap<>();
+	private final Map<String, List<BlifGate>> consumers = new LinkedHashMap<>();
+	private final Map<String, BlifGate> driver = new LinkedHashMap<>();
 	private final List<BlifGate> gates = new ArrayList<>();
 	private final Set<String> clocks = new HashSet<>();
 	private Set<String> inputs;

@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +41,7 @@ public class XnfWriter implements AutoCloseable {
 	}
 
 	public void writeSymbol(final XnfGate gate) throws IOException {
-		final Map<String, String> params = new HashMap<>(gate.getParams());
+		final Map<String, String> params = new LinkedHashMap<>(gate.getParams());
 		params.put("LIBVER", "2.0.0");
 		writeRecord(RecordType.SYM, params, gate.getName().getXnf(), gate.getType());
 		for (final XnfPin pin : gate.getPins()) {
@@ -54,7 +54,7 @@ public class XnfWriter implements AutoCloseable {
 	}
 
 	public void writePad(final XnfPad pad) throws IOException {
-		final Map<String, String> params = new HashMap<>(pad.getParams());
+		final Map<String, String> params = new LinkedHashMap<>(pad.getParams());
 		for (final String flag : pad.getFlags())
 			params.put(flag, null);
 		params.put("LOC", pad.getLoc());

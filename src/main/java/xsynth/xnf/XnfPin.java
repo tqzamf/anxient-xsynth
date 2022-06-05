@@ -1,6 +1,6 @@
 package xsynth.xnf;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import xsynth.naming.Name;
@@ -18,7 +18,7 @@ class XnfPin {
 		this.pin = pin;
 		this.invert = invert;
 		this.signal = signal;
-		this.params = new HashMap<>(params != null ? params : Map.of());
+		this.params = new LinkedHashMap<>(params != null ? params : Map.of());
 	}
 
 	public PinDirection getDir() {

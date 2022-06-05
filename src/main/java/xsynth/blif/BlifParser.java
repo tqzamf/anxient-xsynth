@@ -3,7 +3,7 @@ package xsynth.blif;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class BlifParser {
 
 	private final Map<String, CustomGateFactory> customGates;
 	private final Diagnostics diag;
-	private final Map<String, BlifModel> models = new HashMap<>();
+	private final Map<String, BlifModel> models = new LinkedHashMap<>();
 	private transient int nModels;
 	private transient BlifModel primaryModel;
 	private transient BlifModel model;
@@ -227,8 +227,8 @@ public class BlifParser {
 
 	private CustomGate parseCustomGate(final SourceLocation sloc, final CustomGateFactory factory, final String name,
 			final List<String> line) throws AbortedException {
-		final Map<String, String> inputs = new HashMap<>();
-		final Map<String, String> outputs = new HashMap<>();
+		final Map<String, String> inputs = new LinkedHashMap<>();
+		final Map<String, String> outputs = new LinkedHashMap<>();
 		final List<String> flags = new ArrayList<>();
 
 		AbortedException err = null;
