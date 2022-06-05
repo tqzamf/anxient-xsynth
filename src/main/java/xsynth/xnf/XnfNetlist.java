@@ -1,6 +1,5 @@
 package xsynth.xnf;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,11 +28,12 @@ public class XnfNetlist {
 	}
 
 	public void addPad(final PadType type, final Name signal, final String loc, final Map<String, String> params,
-			final List<String> flags) throws IOException {
+			final List<String> flags) {
 		pads.add(new XnfPad(type, signal, loc, params, flags));
 	}
 
-	public void addLogicGate(final String type, final Name output, final List<Term> inputs) {
+	public void addLogicGate(final String type, final Name output, final boolean invertOutput,
+			final List<Term> inputs) {
 		if (inputs.size() <= 1)
 			throw new IllegalArgumentException("too few inputs: " + inputs);
 
@@ -62,11 +62,10 @@ public class XnfNetlist {
 			gate.connect(PinDirection.CONSUMER, "I" + n, sig.invert, sig.name, null);
 			n++;
 		}
-		gate.connect(PinDirection.DRIVER, "O", false, output, null);
+		gate.connect(PinDirection.DRIVER, "O", invertOutput, output, null);
 	}
 
 	public void addBuffer(final String type, final Name output, final Name input) {
-		System.out.println(type + " " + output + " " + input);
 		final XnfGate gate = addSymbol(type, null);
 		gate.connect(PinDirection.CONSUMER, "I", false, input, null);
 		gate.connect(PinDirection.DRIVER, "O", false, output, null);

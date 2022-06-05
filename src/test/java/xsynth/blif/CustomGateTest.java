@@ -14,8 +14,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import xsynth.Diagnostics;
 import xsynth.Diagnostics.AbortedException;
 import xsynth.DiagnosticsShim;
+import xsynth.SourceLocation;
 
 public class CustomGateTest {
 	private DiagnosticsShim diag;
@@ -188,8 +190,9 @@ public class CustomGateTest {
 		}
 
 		@Override
-		public CustomGate newInstance(final String name, final List<String> flags, final Map<String, String> inputs,
-				final Map<String, String> outputs) throws IllegalArgumentException {
+		public CustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
+				final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs)
+				throws AbortedException {
 			return new CustomGateShim(name, flags, inputs, outputs);
 		}
 
@@ -223,7 +226,7 @@ public class CustomGateTest {
 
 		public CustomGateShim(final String name, final List<String> flags, final Map<String, String> inputs,
 				final Map<String, String> outputs) {
-			super(inputs, outputs);
+			super(outputs, inputs);
 			this.name = name;
 			this.flags = flags;
 			this.inputs = inputs;

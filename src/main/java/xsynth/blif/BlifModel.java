@@ -12,7 +12,7 @@ import xsynth.Diagnostics.AbortedException;
 import xsynth.SourceLocation;
 
 public class BlifModel {
-	private final Map<String, Set<String>> buffers = new HashMap<>();
+	private final Map<String, String> buffers = new HashMap<>();
 	private final Map<String, List<BlifGate>> consumers = new HashMap<>();
 	private final Map<String, BlifGate> driver = new HashMap<>();
 	private final List<BlifGate> gates = new ArrayList<>();
@@ -122,14 +122,21 @@ public class BlifModel {
 		return clocks;
 	}
 
-	public void addBuffers(final String bufferType, final List<String> names) {
-		if (!buffers.containsKey(bufferType))
-			buffers.put(bufferType, new HashSet<>());
-		buffers.get(bufferType).addAll(names);
+	public void addBuffers(final String bufferType, final List<String> names) throws IllegalArgumentException {
+		for (final String name : names) {
+			if (buffers.containsKey(name))
+				throw new IllegalArgumentException(
+						"conflicting buffer types for " + name + ": " + buffers.get(name) + " and " + bufferType);
+			buffers.put(name, bufferType);
+		}
 	}
 
-	public Map<String, Set<String>> getBuffers() {
+	public Map<String, String> getBuffers() {
 		return buffers;
+	}
+
+	public String getBuffer(final String name) {
+		return buffers.get(name);
 	}
 
 	public String getName() {

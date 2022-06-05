@@ -23,6 +23,10 @@ public class SumOfProducts implements BlifGate {
 		return inputNames;
 	}
 
+	public String getOutput() {
+		return outputName;
+	}
+
 	void addProductTerm(final char output, final char... inputs) throws IllegalArgumentException {
 		if (inputs.length != inputNames.size())
 			throw new IllegalArgumentException(

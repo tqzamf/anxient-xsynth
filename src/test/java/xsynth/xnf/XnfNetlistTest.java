@@ -31,7 +31,7 @@ public class XnfNetlistTest {
 		for (int i = 0; i < numInputs; i++)
 			inputs.add(new Term(ns.getGlobal("in" + i), false));
 		final XnfNetlist netlist = new XnfNetlist(3, false, false);
-		netlist.addLogicGate("AND", output, inputs);
+		netlist.addLogicGate("AND", output, false, inputs);
 
 		for (final XnfGate gate : netlist.getGates()) {
 			final List<XnfPin> inpins = new ArrayList<>();
@@ -56,7 +56,7 @@ public class XnfNetlistTest {
 		for (int i = 0; i < 257; i++)
 			inputs.add(new Term(ns.getGlobal("in" + i), false));
 		final XnfNetlist netlist = new XnfNetlist(3, false, false);
-		netlist.addLogicGate("AND", output, inputs);
+		netlist.addLogicGate("AND", output, false, inputs);
 
 		final Map<Name, Integer> depth = inputs.stream().collect(Collectors.toMap(Term::name, x -> 0));
 		for (int i = 0; i < 259; i++)
@@ -95,7 +95,7 @@ public class XnfNetlistTest {
 		final Name input = ns.getGlobal("input");
 		final XnfNetlist netlist = new XnfNetlist(3, false, false);
 		assertThrows(IllegalArgumentException.class,
-				() -> netlist.addLogicGate("AND", output, List.of(new Term(input, false))));
+				() -> netlist.addLogicGate("AND", output, false, List.of(new Term(input, false))));
 	}
 
 	@Test

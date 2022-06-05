@@ -59,9 +59,7 @@ public class BlifParserTest {
 		assertEquals(Set.of("clk"), model.getInputs());
 		assertEquals(Set.of(), model.getOutputs());
 		assertEquals(Set.of("clk"), model.getClocks());
-		// an empty list of buffers is actually very useful for declaring that the
-		// clocks are *not* meant to be implicitly buffered
-		assertEquals(Map.of("bufg", Set.of()), model.getBuffers());
+		assertEquals(Map.of(), model.getBuffers());
 		diag.assertNoMessages();
 
 		// inputs and clocks can overlap. this isn't how berkeley-abc does it, but it's
@@ -74,7 +72,7 @@ public class BlifParserTest {
 		assertEquals(Set.of("clk", "kcl"), model.getClocks());
 		// this is incidentially an example of bufg use: it makes the clk clock
 		// buffered, but not the kcl clock
-		assertEquals(Map.of("bufg", Set.of("clk")), model.getBuffers());
+		assertEquals(Map.of("clk", "bufg"), model.getBuffers());
 		diag.assertNoMessages();
 	}
 
@@ -282,8 +280,9 @@ public class BlifParserTest {
 				{ "re", LatchType.re }, //
 				{ "fe", LatchType.fe }, //
 				{ "ah", LatchType.ah }, //
-				{ "al", LatchType.al }, //
-				{ "as", LatchType.as } };
+				{ "al", LatchType.al } //
+				// { "as", LatchType.as }
+		};
 	}
 
 	@ParameterizedTest
@@ -291,12 +290,12 @@ public class BlifParserTest {
 	public void testLatchInitialValues(final String name, final LatchInitialValue init)
 			throws IOException, AbortedException {
 		// simple example
-		final Latch latch = parseGate(Latch.class, ".latch in out as clk " + name);
+		final Latch latch = parseGate(Latch.class, ".latch in out al clk " + name);
 		assertNames(latch, "out", "in", "clk");
 		assertEquals("in", latch.getDataInput());
 		assertEquals("out", latch.getDataOutput());
 		assertEquals("clk", latch.getClockInput());
-		assertEquals(LatchType.as, latch.getType());
+		assertEquals(LatchType.al, latch.getType());
 		assertEquals(init, latch.getInitialValue());
 		diag.assertNoMessages();
 	}

@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.Map;
 
 public class CustomGate implements BlifGate {
-	private final Map<String, String> inputs;
-	private final Map<String, String> outputs;
+	protected final Map<String, String> inputs;
+	protected final Map<String, String> outputs;
 
-	public CustomGate(final Map<String, String> inputs, final Map<String, String> outputs) {
+	public CustomGate(final Map<String, String> outputs, final Map<String, String> inputs) {
 		this.inputs = inputs;
 		this.outputs = outputs;
 	}

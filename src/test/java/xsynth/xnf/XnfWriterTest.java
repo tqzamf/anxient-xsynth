@@ -91,7 +91,7 @@ public class XnfWriterTest {
 		ns.resolve();
 
 		final XnfNetlist netlist = new XnfNetlist(4, false, false);
-		netlist.addLogicGate("AND", feedback,
+		netlist.addLogicGate("AND", feedback, false,
 				List.of(new Term(output, true), new Term(enable, false), new Term(logic1, false)));
 		netlist.addLatch(LatchType.FLIPFLOP, false, output, feedback, clock, false);
 

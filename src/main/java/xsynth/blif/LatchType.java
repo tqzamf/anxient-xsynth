@@ -9,6 +9,6 @@ public enum LatchType {
 	ah,
 	/** latch, active low */
 	al,
-	/** asynchronous (wtf?) */
-	as
+	// /** asynchronous (wtf?) */
+	// as
 }

@@ -90,7 +90,11 @@ public class BlifParser {
 			case ".buffer" -> { // proprietary
 				if (line.size() < 2)
 					throw diag.error(sloc, line, "illegal .buffer declaration");
-				model.addBuffers(line.get(1), parseNameList(line, 2, 0));
+				try {
+					model.addBuffers(line.get(1), parseNameList(line, 2, 0));
+				} catch (final IllegalArgumentException e) {
+					throw diag.error(sloc, e.getMessage());
+				}
 			}
 			default -> {
 				try {
@@ -264,11 +268,7 @@ public class BlifParser {
 				err = diag.error(sloc, "required gate pin " + pin + " not connected");
 		if (err != null)
 			throw err;
-		try {
-			return factory.newInstance(name, flags, inputs, outputs);
-		} catch (final IllegalArgumentException e) {
-			throw diag.error(sloc, line, e.getMessage());
-		}
+		return factory.newInstance(diag, sloc, name, flags, outputs, inputs);
 	}
 
 	public Map<String, BlifModel> getModels() {
