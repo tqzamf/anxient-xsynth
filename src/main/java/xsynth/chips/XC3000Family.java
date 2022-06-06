@@ -1,7 +1,10 @@
 package xsynth.chips;
 
+import java.util.List;
+
 import xsynth.convert.PadFactory.Resistors;
 import xsynth.convert.PadFactory.SlewRateControl;
+import xsynth.convert.SpecialGateFactory;
 
 public class XC3000Family extends ChipFamily {
 	public XC3000Family() {
@@ -9,5 +12,6 @@ public class XC3000Family extends ChipFamily {
 				Resistors.PULLUP_ONLY, false, false);
 		bufferTypes.add("ACLK");
 		bufferTypes.add("GCLK");
+		customGates.put("OSC", new SpecialGateFactory(List.of("O"), List.of(), List.of("O")));
 	}
 }

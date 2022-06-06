@@ -70,7 +70,7 @@ public class Converter {
 			else if (gate instanceof final Latch latch)
 				implementLatch(ns, model, latch);
 			else if (gate instanceof final XnfCustomGate cg)
-				cg.implement(xnf, ns, signal -> getBufferedOutput(ns, model, signal));
+				cg.implement(xnf, ns, (signal, forceBuffer) -> getBufferedOutput(ns, model, signal, forceBuffer));
 			else
 				throw new UnsupportedOperationException("cannot implement unsupported "
 						+ gate.getClass().getSimpleName() + " gate for outputs=" + gate.getOutputs());
@@ -106,7 +106,7 @@ public class Converter {
 	}
 
 	private void implementSumOfProducts(final Namespace ns, final BlifModel model, final SumOfProducts sop) {
-		final Name output = getBufferedOutput(ns, model, sop.getOutput());
+		final Name output = getBufferedOutput(ns, model, sop.getOutput(), null);
 		if (sop.getTerms().size() == 0) {
 			// no inputs = constant zero. connect to GND via a buffer so we don't have to
 			// bother renaming nets
@@ -171,7 +171,7 @@ public class Converter {
 	}
 
 	private void implementLatch(final Namespace ns, final BlifModel model, final Latch latch) {
-		final Name output = getBufferedOutput(ns, model, latch.getDataOutput());
+		final Name output = getBufferedOutput(ns, model, latch.getDataOutput(), null);
 		final Name input = ns.getGlobal(latch.getDataInput());
 		final Name clock = latch.getClockInput() != null ? ns.getGlobal(latch.getClockInput())
 				: ns.getSpecial(SpecialName.GCLK);
@@ -189,8 +189,16 @@ public class Converter {
 		xnf.addLatch(latchType, latch.getInitialValue() == LatchInitialValue.PRESET, output, input, clock, invertClock);
 	}
 
-	private Name getBufferedOutput(final Namespace ns, final BlifModel model, final String name) {
-		final String buffer = model.getBuffer(name);
+	private Name getBufferedOutput(final Namespace ns, final BlifModel model, final String name,
+			final String forceBuffer) {
+		String buffer = model.getBuffer(name);
+		if (forceBuffer != null) {
+			if (buffer != null && !buffer.equalsIgnoreCase(forceBuffer))
+				throw new IllegalArgumentException("signal " + name + " implicit .buffer " + forceBuffer
+						+ " conflicts with specified .buffer " + buffer);
+			buffer = forceBuffer;
+		}
+
 		final Name globalOutput = ns.getGlobal(name);
 		final Name gateOutput;
 		if (buffer != null) {

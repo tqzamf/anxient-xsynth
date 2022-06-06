@@ -33,7 +33,7 @@ public abstract class XnfCustomGate extends CustomGate {
 		final Map<String, Name> outputs = new LinkedHashMap<>();
 		for (final String port : this.outputs.keySet()) {
 			final String signal = this.outputs.get(port);
-			final Name gateOutput = buffers.getBufferedOutput(signal);
+			final Name gateOutput = buffers.getBufferedOutput(signal, null);
 			outputs.put(port, gateOutput);
 		}
 		implement(xnf, ns, outputs, inputs);
@@ -44,6 +44,6 @@ public abstract class XnfCustomGate extends CustomGate {
 
 	@FunctionalInterface
 	public interface BufferProvider {
-		public Name getBufferedOutput(final String name);
+		public Name getBufferedOutput(final String name, final String forceBuffer);
 	}
 }
