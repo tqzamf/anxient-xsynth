@@ -93,7 +93,8 @@ public class PadFactory implements CustomGateFactory {
 			// tristate control is specified, but output level isn't. consistently assuming
 			// unconnected stuff as zeros, that gives an open-drain output.
 			// it's somewhat stupid though, so warn about it. the cleaner solution is to
-			// just connect the signal to both pins (o and t) for an open-drain output.
+			// just connect the signal to both pins (o and t) for an open-drain output. or
+			// to explicitly connect o=GND; all that takes is a ".names GND" to define it.
 			diag.warn(sloc, "tristate but no output value, creating an open drain output");
 
 		final List<String> xflags = new ArrayList<>();
@@ -136,50 +137,44 @@ public class PadFactory implements CustomGateFactory {
 		public void implement(final XnfNetlist xnf, final Namespace ns, final Map<String, Name> outputs,
 				final Map<String, Name> inputs) {
 			final Name input = outputs.get("i");
-			final Name output = inputs.get("o");
+			Name output = inputs.get("o");
 			final Name tristate = inputs.get("t");
 			// base pad name on driver is possible, else on consumer. (note that an input
 			// pad is a driver of the internal net)
-			Name name = input;
-			if (name == null)
-				name = output;
-			if (name == null)
-				name = tristate;
-			final Name ext = name.getAnonymous("PAD");
+			Name basename = input;
+			if (basename == null)
+				basename = output;
+			if (basename == null)
+				basename = tristate;
+			final Name ext = basename.getAnonymous("PAD");
+			// actually implement the "no output plus tristate = open drain" we warned about
+			// above
+			if (output == null && tristate != null)
+				output = ns.getSpecial(SpecialName.GND);
 
-			// create pad of correct type. note that output pads are always created with
-			// OBUFT buffers, and thus are considered tristate outputs even if they are
-			// always enabled.
-			final boolean isInput = input != null;
-			final boolean isOutput = output != null || tristate != null;
-			final PadType padType;
-			if (isInput && isOutput)
-				padType = PadType.BIDIRECTIONAL;
-			else if (isOutput)
-				padType = PadType.TRISTATE;
-			else if (isInput)
-				padType = PadType.INPUT;
-			else
-				throw new IllegalStateException("no connections");
-			xnf.addPad(padType, ext, loc, null, flags);
-
-			// then create the input and/or output buffers
-			if (isInput) {
+			// always create a bidirectional pad. XACTstep will figure out the pad type from
+			// the input and/or output buffers that are connected to it.
+			xnf.addPad(PadType.BIDIRECTIONAL, ext, loc, null, flags);
+			if (input != null) {
 				final XnfGate gate = xnf.addSymbol("IBUF", nodelay);
 				gate.connect(PinDirection.CONSUMER, "I", false, ext, null);
 				gate.connect(PinDirection.DRIVER, "O", false, input, null);
 			}
-			if (isOutput) {
-				final XnfGate obuf = xnf.addSymbol("OBUFT", null);
+			if (output != null) {
+				final XnfGate obuf;
+				if (tristate != null) {
+					// only create OBUFTs for pads that actually had tristate connected. XACTstep
+					// emits a warning if tristate ends up being always active, and that warning
+					// could be very confusing if tristate is apparently not even connected in the
+					// original design.
+					obuf = xnf.addSymbol("OBUFT", null);
+					obuf.connect(PinDirection.CONSUMER, "T", false, tristate, null);
+				} else
+					obuf = xnf.addSymbol("OBUF", null);
 				obuf.connect(PinDirection.DRIVER, "O", false, ext, null);
-				connectOrGround(ns, obuf, "I", output);
-				connectOrGround(ns, obuf, "T", tristate);
-			}
-		}
+				obuf.connect(PinDirection.CONSUMER, "I", false, output, null);
 
-		private void connectOrGround(final Namespace ns, final XnfGate obuf, final String port, final Name signal) {
-			final Name inputs = signal == null ? ns.getSpecial(SpecialName.GND) : signal;
-			obuf.connect(PinDirection.CONSUMER, port, false, inputs, null);
+			}
 		}
 	}
 }
