@@ -1,6 +1,7 @@
 LCANET,6
 PROG,xsynth,0.0.1,"looks good"
 PART,xc2064pd48-50
+PWR,0,GND
 SYM,ff_rising,DFF,LIBVER=2.0.0
 PIN,C,I,clock
 PIN,D,I,in
@@ -28,5 +29,13 @@ SYM,latch_active_low,DLAT,LIBVER=2.0.0
 PIN,G,I,clock,,INV
 PIN,D,I,in
 PIN,Q,O,latch_active_low
+END
+SYM,in,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,in
+END
+SYM,clock,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,clock
 END
 EOF

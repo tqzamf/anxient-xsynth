@@ -1,5 +1,7 @@
 package xsynth.convert;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -17,31 +19,40 @@ public class ConverterTest {
 	@Test
 	public void testSumOfProducts() throws IOException, AbortedException {
 		final DiagnosticsShim diag = convert("xc3030avg100-7", "sop");
-		diag.assertNumMessages(0, 0, 0);
+		// two warnings regarding undriven global inputs
+		// one info listing all the unused global outputs
+		diag.assertNumMessages(0, 2, 1);
 	}
 
 	@Test
 	public void testSumOfProductsConstants() throws IOException, AbortedException {
 		final DiagnosticsShim diag = convert("xc3030avg100-7", "constants");
-		diag.assertNumMessages(0, 0, 0);
+		// one info listing the unused global outputs
+		diag.assertNumMessages(0, 0, 1);
 	}
 
 	@Test
 	public void testSumOfProductsInversion() throws IOException, AbortedException {
 		final DiagnosticsShim diag = convert("xc3030avg100-7", "invert");
-		diag.assertNumMessages(0, 0, 0);
+		// two warnings regarding undriven global inputs
+		// one info listing all the unused global outputs
+		diag.assertNumMessages(0, 2, 1);
 	}
 
 	@Test
 	public void testLatches() throws IOException, AbortedException {
 		final DiagnosticsShim diag = convert("xc2064pd48-50", "latches");
-		diag.assertNumMessages(0, 0, 0);
+		// two warnings regarding undriven global inputs
+		// one info listing all the unused global outputs
+		diag.assertNumMessages(0, 2, 1);
 	}
 
 	@Test
 	public void testLatchGlobalClock() throws IOException, AbortedException {
 		final DiagnosticsShim diag = convert("xc3030avg100-7", "gclk");
-		diag.assertNumMessages(0, 0, 0);
+		// two warnings regarding undriven global inputs
+		// one info listing all the unused global outputs
+		diag.assertNumMessages(0, 2, 1);
 	}
 
 	@ParameterizedTest
@@ -50,11 +61,13 @@ public class ConverterTest {
 		final DiagnosticsShim diag = convert(part, filename);
 		// two of the pads have a connection to t but not o, which generates a warning
 		// message
-		diag.assertNumMessages(0, 2, 0);
+		// plus 6 warnings regarding undriven global inputs
+		// plus one info listing all the unused global outputs
+		diag.assertNumMessages(0, 8, 1);
 	}
 
 	@Test
-	public void testMerging() throws IOException, AbortedException {
+	public void testMerge() throws IOException, AbortedException {
 		final DiagnosticsShim diag = new DiagnosticsShim();
 		final Converter converter = new Converter(diag, ChipFamily.forPart("2064pd48-50"), false);
 		converter.read(getClass().getResourceAsStream("blinker.blif"), "blinker.blif");
@@ -63,7 +76,24 @@ public class ConverterTest {
 			converter.writeTo(buffer, "2064pd48-50", List.of("--testcase", "merge"));
 			XnfWriterTest.assertIdenticalXnf(getClass(), "blinker.xnf", buffer);
 		}
-		diag.assertNumMessages(0, 0, 3);
+		// 1 warning about the undrinve global reset signal
+		// 2 infos about _LOGIC0 (create by iverilog's tgt-blif) being unused
+		// 1 info about blinkerio being implicitly named
+		diag.assertNumMessages(0, 1, 3);
+	}
+
+	@Test
+	public void testMergeMultipleDrivers() throws IOException, AbortedException {
+		final DiagnosticsShim diag = new DiagnosticsShim();
+		final Converter converter = new Converter(diag, ChipFamily.forPart("2064pd48-50"), false);
+		converter.read(getClass().getResourceAsStream("driver1.blif"), "driver1.blif");
+		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+			assertThrows(AbortedException.class,
+					() -> converter.read(getClass().getResourceAsStream("driver2.blif"), "driver2.blif"));
+		}
+		// 2 errors because test1 and test2 are multiply driven
+		// 2 infos about the other place where they're driven
+		diag.assertNumMessages(2, 0, 2);
 	}
 
 	private DiagnosticsShim convert(final String part, final String filename) throws IOException, AbortedException {

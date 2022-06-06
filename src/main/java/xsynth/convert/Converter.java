@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import xsynth.Diagnostics;
 import xsynth.Diagnostics.AbortedException;
@@ -27,11 +31,15 @@ import xsynth.xnf.XnfNetlist.Term;
 import xsynth.xnf.XnfWriter;
 
 public class Converter {
+	private final Map<String, BlifModel> drivers = new LinkedHashMap<>();
+	private final Map<String, BlifModel> consumers = new LinkedHashMap<>();
+	private final Diagnostics diag;
 	private final BlifParser reader;
 	private final Namespace root;
 	private final XnfNetlist xnf;
 
 	public Converter(final Diagnostics diag, final ChipFamily family, final boolean qualifyAllNames) {
+		this.diag = diag;
 		reader = new BlifParser(diag, family.getCustomGates());
 		root = new Namespace(qualifyAllNames);
 		xnf = new XnfNetlist(family.getMaxGateInputs(), family.hasLatches(), family.hasLatchInitValue());
@@ -39,6 +47,19 @@ public class Converter {
 
 	public void read(final InputStream in, final String filename) throws IOException, AbortedException {
 		final BlifModel model = reader.parse(in, filename);
+		AbortedException err = null;
+		for (final String out : model.getOutputs())
+			if (drivers.containsKey(out)) {
+				final BlifModel driver = drivers.get(out);
+				err = diag.error(model.getSourceLocation(), "global signal " + out + " has multiple drivers");
+				diag.info(driver.getSourceLocation(), "model " + driver.getName() + " also drives " + out);
+			} else
+				drivers.put(out, model);
+		if (err != null)
+			throw err;
+		for (final String i : model.getInputs())
+			consumers.put(i, model);
+
 		final List<String> ports = new ArrayList<>();
 		ports.addAll(model.getInputs());
 		ports.addAll(model.getOutputs());
@@ -56,6 +77,27 @@ public class Converter {
 	}
 
 	public void writeTo(final OutputStream out, final String part, final List<String> cmdline) throws IOException {
+		final Set<String> undriven = new HashSet<>(consumers.keySet());
+		undriven.removeAll(drivers.keySet());
+		for (final String sig : undriven) {
+			diag.warn(consumers.get(sig).getSourceLocation(), "undriven global signal " + sig + ", assuming zero");
+			xnf.addBuffer("BUF", root.getGlobal(sig), root.getSpecial(SpecialName.GND));
+		}
+
+		final Map<BlifModel, List<String>> unused = new LinkedHashMap<>();
+		for (final String signal : drivers.keySet()) {
+			final BlifModel model = drivers.get(signal);
+			if (!unused.containsKey(model))
+				unused.put(model, new ArrayList<>());
+			unused.get(model).add(signal);
+		}
+		for (final BlifModel model : unused.keySet()) {
+			final List<String> list = unused.get(model);
+			list.removeAll(consumers.keySet());
+			if (!list.isEmpty())
+				diag.info(model.getSourceLocation(), "unused global signals: " + String.join(" ", list));
+		}
+
 		root.resolve();
 		try (XnfWriter writer = new XnfWriter(out)) {
 			writer.writeHeader(root, part, cmdline);

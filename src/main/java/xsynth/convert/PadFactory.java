@@ -173,7 +173,6 @@ public class PadFactory implements CustomGateFactory {
 					obuf = xnf.addSymbol("OBUF", null);
 				obuf.connect(PinDirection.DRIVER, "O", false, ext, null);
 				obuf.connect(PinDirection.CONSUMER, "I", false, output, null);
-
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 LCANET,6
 PROG,xsynth,0.0.1,"verified to make sense"
 PART,xc3030avg100-7
+PWR,0,GND
 SYM,out,DFF,LIBVER=2.0.0
 PIN,C,I,GCLK
 PIN,D,I,in
@@ -9,5 +10,13 @@ END
 SYM,GCLK,BUF,LIBVER=2.0.0
 PIN,I,I,clock
 PIN,O,O,GCLK
+END
+SYM,in,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,in
+END
+SYM,clock,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,clock
 END
 EOF

@@ -1,6 +1,7 @@
 LCANET,6
 PROG,xsynth,0.0.1,"converted and very carefully checked for correctness"
 PART,xc3030avg100-7
+PWR,0,GND
 SYM,invertout/singleboth,INV,LIBVER=2.0.0
 PIN,I,I,in
 PIN,O,O,invertout/singleboth
@@ -42,5 +43,13 @@ SYM,invertboth/singleor,AND,LIBVER=2.0.0
 PIN,I0,I,in,,INV
 PIN,I1,I,inner
 PIN,O,O,invertboth/singleor,,INV
+END
+SYM,in,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,in
+END
+SYM,inner,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,inner
 END
 EOF
