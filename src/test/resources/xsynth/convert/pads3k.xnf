@@ -1,6 +1,6 @@
 LCANET,6
 PROG,xsynth,0.0.1,"trivially modified from pads2k.xnf"
-PART,xc3195apc84-2
+PART,3195apc84-2
 PWR,0,GND
 SYM,input,IBUF,LIBVER=2.0.0
 PIN,I,I,input/PAD
@@ -36,6 +36,9 @@ SYM,trisinput/PAD,OBUFT,LIBVER=2.0.0
 PIN,T,I,odtristate
 PIN,O,O,trisinput/PAD
 PIN,I,I,GND
+END
+SYM,odinput/PAD/SYM,PULLUP,LIBVER=2.0.0
+PIN,O,O,odinput/PAD
 END
 SYM,odinput,IBUF,LIBVER=2.0.0
 PIN,I,I,odinput/PAD

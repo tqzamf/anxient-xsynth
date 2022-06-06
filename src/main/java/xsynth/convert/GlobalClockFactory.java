@@ -44,7 +44,7 @@ public class GlobalClockFactory implements CustomGateFactory {
 
 	private class Pad extends XnfCustomGate {
 		public Pad(final Map<String, String> inputs, final Map<String, String> outputs) {
-			super(CustomGateFactory.LATCH_CLOCK_GATE, List.of(), outputs, inputs);
+			super(null, outputs, inputs);
 		}
 
 		@Override

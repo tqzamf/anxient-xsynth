@@ -40,7 +40,7 @@ public class Converter {
 
 	public Converter(final Diagnostics diag, final ChipFamily family, final boolean qualifyAllNames) {
 		this.diag = diag;
-		reader = new BlifParser(diag, family.getCustomGates());
+		reader = new BlifParser(diag, family.getCustomGates(), family.getBufferTypes());
 		root = new Namespace(qualifyAllNames);
 		xnf = new XnfNetlist(family.getMaxGateInputs(), family.hasLatches(), family.hasLatchInitValue());
 	}

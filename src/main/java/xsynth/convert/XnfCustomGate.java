@@ -10,14 +10,20 @@ import xsynth.naming.Namespace;
 import xsynth.xnf.XnfNetlist;
 
 public abstract class XnfCustomGate extends CustomGate {
-	protected final String name;
 	protected final List<String> flags;
+	protected final Map<String, String> params;
+	protected final String name;
 
-	public XnfCustomGate(final String name, final List<String> flags, final Map<String, String> outputs,
-			final Map<String, String> inputs) {
+	public XnfCustomGate(final String name, final Map<String, String> outputs, final Map<String, String> inputs,
+			final List<String> flags, final Map<String, String> params) {
 		super(outputs, inputs);
 		this.name = name;
 		this.flags = flags;
+		this.params = params;
+	}
+
+	public XnfCustomGate(final String name, final Map<String, String> outputs, final Map<String, String> inputs) {
+		this(name, outputs, inputs, List.of(), Map.of());
 	}
 
 	public void implement(final XnfNetlist xnf, final Namespace ns, final BufferProvider buffers) {

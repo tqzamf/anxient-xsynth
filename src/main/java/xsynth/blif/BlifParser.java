@@ -7,15 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import xsynth.Diagnostics;
 import xsynth.Diagnostics.AbortedException;
 import xsynth.SourceLocation;
 
 public class BlifParser {
-	public static final String IOPAD_GATE = "iopad";
-
 	private final Map<String, CustomGateFactory> customGates;
+	private final Set<String> bufferTypes;
 	private final Diagnostics diag;
 	private final Map<String, BlifModel> models = new LinkedHashMap<>();
 	private transient int nModels;
@@ -23,9 +23,11 @@ public class BlifParser {
 	private transient BlifModel model;
 	private transient SumOfProducts sop;
 
-	public BlifParser(final Diagnostics diag, final Map<String, CustomGateFactory> customGates) {
+	public BlifParser(final Diagnostics diag, final Map<String, CustomGateFactory> customGates,
+			final Set<String> bufferTypes) {
 		this.diag = diag;
 		this.customGates = customGates;
+		this.bufferTypes = bufferTypes;
 	}
 
 	public BlifModel parse(final String filename) throws IOException, AbortedException {
@@ -90,8 +92,11 @@ public class BlifParser {
 			case ".buffer" -> { // proprietary
 				if (line.size() < 2)
 					throw diag.error(sloc, line, "illegal .buffer declaration");
+				final String type = line.get(1).toUpperCase(Locale.ROOT);
+				if (!bufferTypes.contains(type))
+					throw diag.error(sloc, "unsuppoerted .buffer " + type);
 				try {
-					model.addBuffers(line.get(1), parseNameList(line, 2, 0));
+					model.addBuffers(type, parseNameList(line, 2, 0));
 				} catch (final IllegalArgumentException e) {
 					throw diag.error(sloc, e.getMessage());
 				}
@@ -209,7 +214,7 @@ public class BlifParser {
 		case ".gate" -> { // semi-proprietary: multiple outputs, flags
 			if (line.size() < 2)
 				throw diag.error(sloc, line, "illegal .gate declaration");
-			final String type = line.get(1).toLowerCase(Locale.ROOT);
+			final String type = line.get(1).toUpperCase(Locale.ROOT);
 			if (!customGates.containsKey(type))
 				throw diag.error(sloc, "unsupported .gate " + type);
 			yield parseCustomGate(sloc, customGates.get(type), type, line);

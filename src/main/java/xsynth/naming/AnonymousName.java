@@ -3,7 +3,7 @@ package xsynth.naming;
 import java.util.regex.Pattern;
 
 class AnonymousName extends Numbered {
-	private static final Pattern QUALIFIER = Pattern.compile("[A-Z]+");
+	private static final Pattern QUALIFIER = Pattern.compile("[A-Z0-9_]+");
 
 	private final Name base;
 	private final String qualifier;

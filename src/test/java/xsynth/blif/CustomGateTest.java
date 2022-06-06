@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -150,8 +151,8 @@ public class CustomGateTest {
 
 	private void parseGate(final List<String> inputs, final List<String> outputs, final List<String> required,
 			final List<String> flags, final String decl) throws IOException, AbortedException {
-		parse("testgate", inputs, outputs, required, flags, decl);
-		assertEquals("testgate", gate.getName());
+		parse("TESTGATE", inputs, outputs, required, flags, decl);
+		assertEquals("TESTGATE", gate.getName());
 	}
 
 	private void parsePad(final String decl) throws IOException, AbortedException {
@@ -165,7 +166,7 @@ public class CustomGateTest {
 		try (ByteArrayInputStream data = new ByteArrayInputStream(
 				(".model test\n" + decl).getBytes(StandardCharsets.UTF_8))) {
 			final BlifParser parser = new BlifParser(diag,
-					Map.of(gatename, new CustomGateFactoryShim(inputs, outputs, required, flags)));
+					Map.of(gatename, new CustomGateFactoryShim(inputs, outputs, required, flags)), Set.of());
 			model = parser.parse(data, "test.blif");
 		}
 		assertNotNull(model);

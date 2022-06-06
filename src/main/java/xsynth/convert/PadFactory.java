@@ -34,19 +34,15 @@ public class PadFactory implements CustomGateFactory {
 	private static final List<String> IMPEDS = List.of(IMPED_CAP, IMPED_RES);
 	private static final String DELAY_NONE = "nodelay";
 	private static final String DELAY_DEFAULT = "delay";
+	private static final String RESISTOR_PULLUP = "pullup";
+	private static final String RESISTOR_PULLDOWN = "pulldown";
 
 	private final List<String> flags = new ArrayList<>();
 
-	public PadFactory(final boolean hasFastSlow, final boolean hasMedSpeed, final boolean hasNoDelay,
+	public PadFactory(final SlewRateControl slewRateControl, final Resistors resistors, final boolean hasNoDelay,
 			final boolean hasDriverType) {
-		if (hasFastSlow) {
-			flags.add(SPEED_FAST);
-			flags.add(SPEED_SLOW);
-		}
-		if (hasMedSpeed) {
-			flags.add(SPEED_MEDFAST);
-			flags.add(SPEED_MEDSLOW);
-		}
+		flags.addAll(slewRateControl.flags);
+		flags.addAll(resistors.flags);
 		if (hasNoDelay) {
 			flags.add(DELAY_NONE);
 			flags.add(DELAY_DEFAULT); // for completeness; not actually passed on
@@ -108,7 +104,17 @@ public class PadFactory implements CustomGateFactory {
 			throw diag.error(sloc, "inconsistent delay flags: delay and nodelay");
 		final boolean nodelay = flags.contains(DELAY_NONE);
 
-		return new Pad(loc, xflags, inputs, outputs, nodelay);
+		if (flags.contains(RESISTOR_PULLDOWN) && flags.contains(RESISTOR_PULLUP))
+			throw diag.error(sloc, "inconsistent resistor flags: pullup and pulldown");
+		final String resistor;
+		if (flags.contains(RESISTOR_PULLDOWN))
+			resistor = RESISTOR_PULLDOWN;
+		else if (flags.contains(RESISTOR_PULLUP))
+			resistor = RESISTOR_PULLUP;
+		else
+			resistor = null;
+
+		return new Pad(loc, outputs, inputs, xflags, nodelay, resistor);
 	}
 
 	private void setFlags(final List<String> xflags, final String name, final List<String> flags,
@@ -123,11 +129,13 @@ public class PadFactory implements CustomGateFactory {
 	private class Pad extends XnfCustomGate {
 		private final String loc;
 		private final Map<String, String> nodelay;
+		private final String resistor;
 
-		public Pad(final String loc, final List<String> flags, final Map<String, String> inputs,
-				final Map<String, String> outputs, final boolean nodelay) {
-			super(CustomGateFactory.IOPAD_GATE, flags, outputs, inputs);
+		public Pad(final String loc, final Map<String, String> outputs, final Map<String, String> inputs,
+				final List<String> flags, final boolean nodelay, final String resistor) {
+			super(null, outputs, inputs, flags, Map.of());
 			this.loc = loc;
+			this.resistor = resistor;
 			this.nodelay = new LinkedHashMap<>();
 			if (nodelay)
 				this.nodelay.put("NODELAY", null);
@@ -155,6 +163,18 @@ public class PadFactory implements CustomGateFactory {
 			// always create a bidirectional pad. XACTstep will figure out the pad type from
 			// the input and/or output buffers that are connected to it.
 			xnf.addPad(PadType.BIDIRECTIONAL, ext, loc, null, flags);
+			// add pullup/pulldown resistors. some chips don't accept a pullup on an output
+			// that cannot be tristated, but that can be left to XACTstep to check.
+			// note the special direction "pullup" to avoid it being named according to its
+			// output signal. that signal can also be driven by the IBUF, so the gate name
+			// wouldn't be unique
+			if (resistor != null) {
+				final XnfGate gate = xnf.addSymbol(resistor.toUpperCase(Locale.ROOT), null);
+				gate.connect(PinDirection.PULLUP, "O", false, ext, null);
+				gate.allocateName(); // to generate a unique name derived from its almost-output
+			}
+			// create suitable IO buffers. if a pin is input-only or output-only, XACTstep
+			// will report that, so no point in detecting that here
 			if (input != null) {
 				final XnfGate gate = xnf.addSymbol("IBUF", nodelay);
 				gate.connect(PinDirection.CONSUMER, "I", false, ext, null);
@@ -174,6 +194,26 @@ public class PadFactory implements CustomGateFactory {
 				obuf.connect(PinDirection.DRIVER, "O", false, ext, null);
 				obuf.connect(PinDirection.CONSUMER, "I", false, output, null);
 			}
+		}
+	}
+
+	public enum SlewRateControl {
+		NONE, COARSE(SPEED_FAST, SPEED_SLOW), FINE(SPEED_FAST, SPEED_MEDFAST, SPEED_MEDSLOW, SPEED_SLOW);
+
+		private List<String> flags;
+
+		private SlewRateControl(final String... speeds) {
+			flags = List.of(speeds);
+		}
+	}
+
+	public enum Resistors {
+		NONE, PULLUP_ONLY(RESISTOR_PULLUP), PULLUP_PULLDOWN(RESISTOR_PULLUP, RESISTOR_PULLDOWN);
+
+		private List<String> flags;
+
+		private Resistors(final String... resistors) {
+			flags = List.of(resistors);
 		}
 	}
 }

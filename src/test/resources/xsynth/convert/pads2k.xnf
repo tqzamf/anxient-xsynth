@@ -1,6 +1,6 @@
 LCANET,6
 PROG,xsynth,0.0.1,"visually verified to make sense"
-PART,xc2064pd48-50
+PART,2064pd48-50
 PWR,0,GND
 SYM,input,IBUF,LIBVER=2.0.0
 PIN,I,I,input/PAD

@@ -3602,7 +3602,7 @@ SYM,blinker/_ivl_40<33>,BUF,LIBVER=2.0.0
 PIN,I,I,GND
 PIN,O,O,blinker/_ivl_40<33>
 END
-SYM,clock,bufg,LIBVER=2.0.0
+SYM,clock,BUFG,LIBVER=2.0.0
 PIN,I,I,clock/BUFG
 PIN,O,O,clock
 END

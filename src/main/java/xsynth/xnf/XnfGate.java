@@ -29,14 +29,27 @@ public class XnfGate {
 		return name;
 	}
 
+	/**
+	 * must be called to assign a name to gates that don't drive any nets. dates
+	 * without outputs cannot be named after their output net because there is none,
+	 * and they cannot be named after their input nets either because those names
+	 * are already in use by the drivers of those nets.
+	 */
+	public void allocateName() {
+		if (name != null)
+			throw new IllegalStateException("allocateName() has already beed called for " + name);
+		for (final XnfPin pin : pins)
+			if (pin.getDir() == PinDirection.DRIVER)
+				throw new IllegalStateException("allocateName() on gate which drives " + pin.getSignal());
+		name = pins.get(0).getSignal().getAnonymous("SYM");
+	}
+
 	private Name computeName() {
 		// derive block name from the net it drives
 		for (final XnfPin pin : pins)
 			if (pin.getDir() == PinDirection.DRIVER)
 				return pin.getSignal();
-		// in the rare case that a block doesn't drive anything (basically only RDCLK
-		// and the special output pads), use a name derived from its first input
-		return pins.get(0).getSignal().getAnonymous("SYM");
+		throw new IllegalStateException("allocateName() has not beed called for " + name);
 	}
 
 	public Map<String, String> getParams() {

@@ -1,7 +1,7 @@
 package xsynth.xnf;
 
 public enum PinDirection {
-	DRIVER("O"), CONSUMER("I");
+	DRIVER("O"), CONSUMER("I"), PULLUP("O");
 
 	private final String code;
 

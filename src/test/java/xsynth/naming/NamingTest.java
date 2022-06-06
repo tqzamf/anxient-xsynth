@@ -121,6 +121,32 @@ public class NamingTest {
 	}
 
 	@Test
+	public void testGlobalAnonymousNames() {
+		final Namespace names = new Namespace(false);
+		final Name a = names.getGlobal("/BSCAN_TDO");
+		final Name b = names.getSpecial("BSCAN");
+		final Name c = names.getAnonymous("BSCAN_TDO");
+		final Name d = names.getAnonymous("BSCAN_TDO");
+		final Namespace foo = names.getNamespace("test", List.of());
+		final Name e = foo.getGlobal("BSCAN_TDO");
+		final Name f = foo.getSpecial("BSCAN");
+		final Name g = foo.getAnonymous("BSCAN_TDO");
+		final Name h = foo.getAnonymous("BSCAN_TDO");
+		names.resolve();
+		// getting an anonymous name from the namespace just gives a unique name in that
+		// namespace. it is separate from the global and special namespaces, and like
+		// all anonymous names, renames out of the way
+		assertEquals("/BSCAN_TDO", a.getXnf());
+		assertEquals("BSCAN", b.getXnf());
+		assertEquals("/BSCAN_TDO1", c.getXnf());
+		assertEquals("/BSCAN_TDO2", d.getXnf());
+		assertEquals("test/BSCAN_TDO", e.getXnf());
+		assertEquals("BSCAN", f.getXnf());
+		assertEquals("test/BSCAN_TDO", g.getXnf());
+		assertEquals("test/BSCAN_TDO1", h.getXnf());
+	}
+
+	@Test
 	public void testHierarchicalNamespaces() {
 		final Namespace root = new Namespace(false);
 		final Namespace foo = root.getNamespace("foo", List.of());

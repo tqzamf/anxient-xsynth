@@ -109,8 +109,8 @@ public class ConverterTest {
 
 	public static String[][] getPadTestPairs() {
 		return new String[][] { //
-				{ "xc2064pd48-50", "pads2k" }, //
-				{ "xc3195apc84-2", "pads3k" }, //
-				{ "xc5202pq100-5", "pads5k2" } };
+				{ "2064pd48-50", "pads2k" }, //
+				{ "3195apc84-2", "pads3k" }, //
+				{ "5202pq100-5", "pads5k2" } };
 	}
 }

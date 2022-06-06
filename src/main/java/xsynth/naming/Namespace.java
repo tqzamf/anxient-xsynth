@@ -26,6 +26,7 @@ public class Namespace extends GlobalName {
 		specials = new LinkedHashMap<>();
 		parent = null;
 		ports = Map.of();
+		setXnf("");
 	}
 
 	Namespace(final Namespace parent, final String name, final Map<String, String> ports) {
@@ -49,6 +50,11 @@ public class Namespace extends GlobalName {
 		final AnonymousName name = new AnonymousName(this, base, qualifier);
 		derived.add(name);
 		return name;
+	}
+
+	@Override
+	public Name getAnonymous(final String qualifier) {
+		return this.getAnonymous(this, qualifier);
 	}
 
 	public Name getSpecial(final String name) {

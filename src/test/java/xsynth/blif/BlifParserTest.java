@@ -72,7 +72,7 @@ public class BlifParserTest {
 		assertEquals(Set.of("clk", "kcl"), model.getClocks());
 		// this is incidentially an example of bufg use: it makes the clk clock
 		// buffered, but not the kcl clock
-		assertEquals(Map.of("clk", "bufg"), model.getBuffers());
+		assertEquals(Map.of("clk", "BUFG"), model.getBuffers());
 		diag.assertNoMessages();
 	}
 
@@ -401,7 +401,7 @@ public class BlifParserTest {
 		diag = new DiagnosticsShim();
 		try (ByteArrayInputStream data = new ByteArrayInputStream(
 				String.join("\n", lines).getBytes(StandardCharsets.UTF_8))) {
-			final BlifParser parser = new BlifParser(diag, Map.of());
+			final BlifParser parser = new BlifParser(diag, Map.of(), Set.of("BUFG"));
 			model = parser.parse(data, "/opt/xsynth/test.blif");
 			return parser.getModels();
 		}

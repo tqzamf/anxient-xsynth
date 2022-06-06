@@ -5,4 +5,4 @@
 .pad p4 o=trisoutput t=tristate
 .pad p5 i=bidinput o=bidoutput
 .pad p6 i=trisinput t=odtristate
-.pad p7 i=odinput o=opendrain t=opendrain slow
+.pad p7 i=odinput o=opendrain t=opendrain slow pullup
