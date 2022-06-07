@@ -38,6 +38,7 @@ public class ReadbackFactory extends SpecialGateFactory {
 				if (clock != null) {
 					final XnfGate gate = xnf.addSymbol("RDCLK", null);
 					gate.connect(PinDirection.CONSUMER, "I", false, clock, null);
+					gate.allocateName();
 				}
 			}
 		};

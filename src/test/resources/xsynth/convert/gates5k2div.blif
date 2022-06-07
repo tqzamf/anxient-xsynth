@@ -1,0 +1,5 @@
+.model gates5k2div
+# these conflict: onl OSC1 can do ÷4 and ÷16, but obviously can only do one at a time
+.gate osc52 div4=clock4m div16=clock1m
+.pad P1 o=clock4m
+.pad P2 o=clock1m

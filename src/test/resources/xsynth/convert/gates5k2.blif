@@ -1,0 +1,13 @@
+.model gates5k2
+# clocks are auto-allocated to the right output
+.gate osc52 div16384=clock1k div4=clock4m
+# explicitly drive global reset from a pin
+.pad P1 i=reset
+.gate startup clk=clock4m gr=reset
+# no rdclk without clock, ie. it uses CCLK for readback 
+.gate rdbk
+# invoke JTAG TAP, redirecting TDO through another chip
+# TDO is explicitly conencted, so no implicit TDO pad
+# TDO1 works properly but TDO2 is just left open
+.gate bscan tdo1=clock1k tdo=alt_tdo
+.pad P2 o=alt_tdo pullup

@@ -58,12 +58,44 @@ public class ConverterTest {
 	@ParameterizedTest
 	@MethodSource("getPadTestPairs")
 	public void testPads(final String part, final String filename) throws IOException, AbortedException {
-		final DiagnosticsShim diag = convert(part, filename);
+		final DiagnosticsShim diag = convert(part, filename, filename);
 		// two of the pads have a connection to t but not o, which generates a warning
 		// message
 		// plus 6 warnings regarding undriven global inputs
 		// plus one info listing all the unused global outputs
 		diag.assertNumMessages(0, 8, 1);
+	}
+
+	public static String[][] getPadTestPairs() {
+		return new String[][] { //
+				{ "2064pd48-50", "pads2k" }, //
+				{ "3195apc84-2", "pads3k" }, //
+				{ "5202pq100-5", "pads5k2" } };
+	}
+
+	@ParameterizedTest
+	@MethodSource("getSpecialGateTestPairs")
+	public void testSpecialGates(final String part, final String infile, final String outfile)
+			throws IOException, AbortedException {
+		final DiagnosticsShim diag = convert(part, infile, outfile);
+		diag.assertNumMessages(0, 0, 0);
+	}
+
+	public static String[][] getSpecialGateTestPairs() {
+		return new String[][] { //
+				{ "2064pd48-50", "gates2k1", "gates2k" }, //
+				{ "2064pd48-50", "gates2k2", "gates2k" }, //
+				{ "3195apc84-2", "gates3k1", "gates3k1" }, //
+				{ "3195apc84-2", "gates3k2", "gates3k2" }, //
+				{ "5202pq100-5", "gates5k2", "gates5k2" }, //
+				{ "5202pq100-5", "gates5k2rdclk", "gates5k2rdclk" } };
+	}
+
+	@Test
+	public void testXC5200ConflictingDividers() throws IOException, AbortedException {
+		final DiagnosticsShim diag = assertThrowsAbortedException("5202pq100-5", "gates5k2div.blif");
+		// 1 error about the two clocks having to use the same divider output
+		diag.assertNumMessages(1, 0, 0);
 	}
 
 	@Test
@@ -96,21 +128,44 @@ public class ConverterTest {
 		diag.assertNumMessages(2, 0, 2);
 	}
 
-	private DiagnosticsShim convert(final String part, final String filename) throws IOException, AbortedException {
+	@Test
+	public void testIllegalBufferType() throws IOException, AbortedException {
+		final DiagnosticsShim diag = assertThrowsAbortedException("2064pd48-50", "badbuf.blif");
+		// 1 error about the nonexistent buffer type
+		diag.assertNumMessages(1, 0, 0);
+	}
+
+	@Test
+	public void testBufferNonexistentSignal() throws IOException, AbortedException {
+		final DiagnosticsShim diag = convert("2064pd48-50", "unusedbuf");
+		// 2 warnings about buffers on nets that don't exist
+		diag.assertNumMessages(0, 2, 0);
+	}
+
+	private DiagnosticsShim assertThrowsAbortedException(final String part, final String filename) throws IOException {
 		final DiagnosticsShim diag = new DiagnosticsShim();
 		final Converter converter = new Converter(diag, ChipFamily.forPart(part), false);
-		converter.read(getClass().getResourceAsStream(filename + ".blif"), filename + ".blif");
 		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-			converter.writeTo(buffer, part, List.of("--testcase", filename));
-			XnfWriterTest.assertIdenticalXnf(getClass(), filename + ".xnf", buffer);
+			assertThrows(AbortedException.class,
+					() -> converter.read(getClass().getResourceAsStream(filename), filename));
 		}
 		return diag;
 	}
 
-	public static String[][] getPadTestPairs() {
-		return new String[][] { //
-				{ "2064pd48-50", "pads2k" }, //
-				{ "3195apc84-2", "pads3k" }, //
-				{ "5202pq100-5", "pads5k2" } };
+	private DiagnosticsShim convert(final String part, final String filename) throws IOException, AbortedException {
+		return convert(part, filename, filename);
+	}
+
+	private DiagnosticsShim convert(final String part, final String infile, final String outfile)
+			throws IOException, AbortedException {
+		final DiagnosticsShim diag = new DiagnosticsShim();
+		final Converter converter = new Converter(diag, ChipFamily.forPart(part), false);
+		converter.read(getClass().getResourceAsStream(infile + ".blif"), infile + ".blif");
+		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+			converter.writeTo(buffer, part, List.of("--testcase", infile));
+			buffer.writeTo(System.out);
+			XnfWriterTest.assertIdenticalXnf(getClass(), outfile + ".xnf", buffer);
+		}
+		return diag;
 	}
 }

@@ -41,7 +41,7 @@ public class XnfGate {
 		for (final XnfPin pin : pins)
 			if (pin.getDir() == PinDirection.DRIVER)
 				throw new IllegalStateException("allocateName() on gate which drives " + pin.getSignal());
-		name = pins.get(0).getSignal().getAnonymous("SYM");
+		name = pins.get(0).getSignal().getAnonymous(type);
 	}
 
 	private Name computeName() {
@@ -49,7 +49,7 @@ public class XnfGate {
 		for (final XnfPin pin : pins)
 			if (pin.getDir() == PinDirection.DRIVER)
 				return pin.getSignal();
-		throw new IllegalStateException("allocateName() has not beed called for " + name);
+		throw new IllegalStateException("allocateName() has not beed called for " + type + " symbol");
 	}
 
 	public Map<String, String> getParams() {

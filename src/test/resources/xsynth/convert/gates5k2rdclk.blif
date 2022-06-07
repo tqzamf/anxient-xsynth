@@ -1,0 +1,6 @@
+.model gates5k2rdclk
+# explicit connection to RDBK CLK adds RDCLK and wires it up
+.gate osc52 div65536=clock c=clkin
+.gate rdbk clk=clock trig=trigger
+.pad P1 i=trigger
+.pad P2 i=clkin

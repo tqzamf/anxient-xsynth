@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import xsynth.Diagnostics;
 import xsynth.Diagnostics.AbortedException;
@@ -20,8 +21,8 @@ public class SpecialGateFactory implements CustomGateFactory {
 	private final List<String> outputs;
 	private final List<String> inputs;
 	private final List<String> required;
-	private final Map<String, String> specialInputs = new LinkedHashMap<>();
-	private final Map<String, String> specialOutputs = new LinkedHashMap<>();
+	private final Map<String, String> specialInputs = new TreeMap<>();
+	private final Map<String, String> specialOutputs = new TreeMap<>();
 
 	public SpecialGateFactory(final List<String> outputs, final List<String> inputs, final List<String> required,
 			final List<String> flags, final Map<String, String> specialPadConnections) {
@@ -84,7 +85,7 @@ public class SpecialGateFactory implements CustomGateFactory {
 			final XnfGate gate = xnf.addSymbol(name.toUpperCase(Locale.ROOT), flags);
 			connectAll(xnf, ns, gate, PinDirection.CONSUMER, inputs, specialInputs);
 			connectAll(xnf, ns, gate, PinDirection.DRIVER, outputs, specialOutputs);
-			if (outputs.isEmpty())
+			if (outputs.isEmpty() && specialOutputs.isEmpty())
 				gate.allocateName();
 		}
 
@@ -100,9 +101,10 @@ public class SpecialGateFactory implements CustomGateFactory {
 					final XnfGate pad = xnf.addSymbol(specialPad.get(port), null);
 					final Name wire = ns.getAnonymous(gate.getType() + "_" + port);
 					gate.connect(dir, port, false, wire, null);
-					if (dir == PinDirection.DRIVER)
+					if (dir == PinDirection.DRIVER) {
 						pad.connect(PinDirection.CONSUMER, "I", false, wire, null);
-					else
+						pad.allocateName();
+					} else
 						pad.connect(PinDirection.DRIVER, "O", false, wire, null);
 				}
 		}

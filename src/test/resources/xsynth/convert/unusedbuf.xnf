@@ -1,0 +1,18 @@
+LCANET,6
+PROG,xsynth,0.0.1,"obviously correct, though we care more about the warnings than the output"
+PART,2064pd48-50
+PWR,0,GND
+SYM,unbuf/wire,GCLK,LIBVER=2.0.0
+PIN,I,I,unbuf/wire/GCLK
+PIN,O,O,unbuf/wire
+END
+SYM,unbuf/wire/GCLK,BUF,LIBVER=2.0.0
+PIN,I,I,GND
+PIN,O,O,unbuf/wire/GCLK
+END
+SYM,unbuf/wire/PAD,OBUF,LIBVER=2.0.0
+PIN,O,O,unbuf/wire/PAD
+PIN,I,I,unbuf/wire
+END
+EXT,unbuf/wire/PAD,B,,LOC=P1
+EOF

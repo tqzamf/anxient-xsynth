@@ -241,7 +241,7 @@ public class BlifParser {
 			final String decl = line.get(i);
 			final int eq = decl.indexOf('=');
 			if (eq < 0) {
-				final String flag = decl.toLowerCase(Locale.ROOT);
+				final String flag = decl.toUpperCase(Locale.ROOT);
 				if (!factory.getFlags().contains(flag))
 					err = diag.error(sloc, "unknown flag " + flag);
 				if (flags.contains(flag))
@@ -250,7 +250,7 @@ public class BlifParser {
 				continue;
 			}
 
-			final String pin = decl.substring(0, eq).toLowerCase(Locale.ROOT);
+			final String pin = decl.substring(0, eq).toUpperCase(Locale.ROOT);
 			final String signal = decl.substring(eq + 1);
 			if (pin.isEmpty())
 				err = diag.error(sloc, "missing pin name");

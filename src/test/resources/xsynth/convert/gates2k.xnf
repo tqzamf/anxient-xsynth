@@ -1,0 +1,25 @@
+LCANET,6
+PROG,xsynth,0.0.1,"OSC goes via ACLK, whether it has been specified or not"
+PART,2064pd48-50
+SYM,gates2k/clock,ACLK,LIBVER=2.0.0
+PIN,I,I,gates2k/clock/ACLK
+PIN,O,O,gates2k/clock
+END
+SYM,gates2k/clock/ACLK,OSC,LIBVER=2.0.0
+PIN,O,O,gates2k/clock/ACLK
+END
+SYM,gates2k/d,INV,LIBVER=2.0.0
+PIN,I,I,gates2k/toggle
+PIN,O,O,gates2k/d
+END
+SYM,gates2k/toggle,DFF,LIBVER=2.0.0
+PIN,C,I,gates2k/clock
+PIN,D,I,gates2k/d
+PIN,Q,O,gates2k/toggle
+END
+SYM,gates2k/toggle/PAD,OBUF,LIBVER=2.0.0
+PIN,O,O,gates2k/toggle/PAD
+PIN,I,I,gates2k/toggle
+END
+EXT,gates2k/toggle/PAD,B,,LOC=P1
+EOF

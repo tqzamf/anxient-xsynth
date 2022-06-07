@@ -1,0 +1,3 @@
+.model badbuf
+.buffer bad wire
+.names wire

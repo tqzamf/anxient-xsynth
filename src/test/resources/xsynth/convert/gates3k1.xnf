@@ -1,0 +1,21 @@
+LCANET,6
+PROG,xsynth,0.0.1,"OSC doesn't use ACLK automatically"
+PART,3195apc84-2
+SYM,gates3k/clock,OSC,LIBVER=2.0.0
+PIN,O,O,gates3k/clock
+END
+SYM,gates3k/d,INV,LIBVER=2.0.0
+PIN,I,I,gates3k/toggle
+PIN,O,O,gates3k/d
+END
+SYM,gates3k/toggle,DFF,LIBVER=2.0.0
+PIN,C,I,gates3k/clock
+PIN,D,I,gates3k/d
+PIN,Q,O,gates3k/toggle
+END
+SYM,gates3k/toggle/PAD,OBUF,LIBVER=2.0.0
+PIN,O,O,gates3k/toggle/PAD
+PIN,I,I,gates3k/toggle
+END
+EXT,gates3k/toggle/PAD,B,,LOC=P1
+EOF

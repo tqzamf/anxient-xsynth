@@ -21,21 +21,21 @@ import xsynth.xnf.XnfGate;
 import xsynth.xnf.XnfNetlist;
 
 public class PadFactory implements CustomGateFactory {
-	private static final String SPEED_FAST = "fast";
-	private static final String SPEED_SLOW = "slow";
-	private static final String SPEED_MEDFAST = "medfast";
-	private static final String SPEED_MEDSLOW = "medslow";
+	private static final String SPEED_FAST = "FAST";
+	private static final String SPEED_SLOW = "SLOW";
+	private static final String SPEED_MEDFAST = "MEDFAST";
+	private static final String SPEED_MEDSLOW = "MEDSLOW";
 	private static final List<String> SPEEDS = List.of(SPEED_FAST, SPEED_SLOW, SPEED_MEDFAST, SPEED_MEDSLOW);
-	private static final String LEVEL_TTL = "ttl";
-	private static final String LEVEL_CMOS = "cmos";
+	private static final String LEVEL_TTL = "TTL";
+	private static final String LEVEL_CMOS = "CMOS";
 	private static final List<String> LEVELS = List.of(LEVEL_TTL, LEVEL_CMOS);
-	private static final String IMPED_CAP = "cap";
-	private static final String IMPED_RES = "res";
+	private static final String IMPED_CAP = "CAP";
+	private static final String IMPED_RES = "RES";
 	private static final List<String> IMPEDS = List.of(IMPED_CAP, IMPED_RES);
-	private static final String DELAY_NONE = "nodelay";
-	private static final String DELAY_DEFAULT = "delay";
-	private static final String RESISTOR_PULLUP = "pullup";
-	private static final String RESISTOR_PULLDOWN = "pulldown";
+	private static final String DELAY_NONE = "NODELAY";
+	private static final String DELAY_DEFAULT = "DELAY";
+	private static final String RESISTOR_PULLUP = "PULLUP";
+	private static final String RESISTOR_PULLDOWN = "PULLDOWN";
 
 	private final List<String> flags = new ArrayList<>();
 
@@ -58,12 +58,12 @@ public class PadFactory implements CustomGateFactory {
 
 	@Override
 	public List<String> getInputs() {
-		return List.of("o", "t");
+		return List.of("O", "T");
 	}
 
 	@Override
 	public List<String> getOutputs() {
-		return List.of("i");
+		return List.of("I");
 	}
 
 	@Override
@@ -80,9 +80,9 @@ public class PadFactory implements CustomGateFactory {
 	public CustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String loc,
 			final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs)
 			throws AbortedException {
-		final boolean input = outputs.containsKey("i");
-		final boolean output = inputs.containsKey("o");
-		final boolean tristate = inputs.containsKey("t");
+		final boolean input = outputs.containsKey("I");
+		final boolean output = inputs.containsKey("O");
+		final boolean tristate = inputs.containsKey("T");
 		if (!input && !output && !tristate)
 			throw diag.error(sloc, "unconnected IO pad " + loc);
 		if (tristate && !output)
@@ -144,9 +144,9 @@ public class PadFactory implements CustomGateFactory {
 		@Override
 		public void implement(final XnfNetlist xnf, final Namespace ns, final Map<String, Name> outputs,
 				final Map<String, Name> inputs) {
-			final Name input = outputs.get("i");
-			Name output = inputs.get("o");
-			final Name tristate = inputs.get("t");
+			final Name input = outputs.get("I");
+			Name output = inputs.get("O");
+			final Name tristate = inputs.get("T");
 			// base pad name on driver is possible, else on consumer. (note that an input
 			// pad is a driver of the internal net)
 			Name basename = input;

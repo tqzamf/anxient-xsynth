@@ -18,11 +18,11 @@ public class XC5200Family extends ChipFamily {
 		super("XC5200", "52[0-9]{2}", 5, true, false, SlewRateControl.COARSE, Resistors.PULLUP_PULLDOWN, true, false);
 		customGates.put("BSCAN", new SpecialGateFactory( //
 				List.of("RESET", "UPDATE", "SHIFT", "TDO", "DRCK", "IDLE", "SEL1", "SEL2"), //
-				List.of("TDI", "TMS", "TCK", "TDO1", "TDO2"), List.of(), List.of(),
+				List.of("TDI", "TMS", "TCK", "TDO1", "TDO2"), List.of(), List.of(), //
 				Map.of("TDI", "TDI", "TDO", "TDO", "TMS", "TMS", "TCK", "TCK")));
 		customGates.put("RDBK", new ReadbackFactory());
-		customGates.put("STARTUP",
-				new SpecialGateFactory(List.of("Q2", "Q3", "Q1Q4", "DONEIN"), List.of("GR", "GTS", "CLK"), List.of()));
+		customGates.put("STARTUP", new SpecialGateFactory(List.of("Q2", "Q3", "Q1Q4", "DONEIN"), //
+				List.of("GR", "GTS", "CLK"), List.of()));
 		customGates.put("OSC52", new OSC52());
 	}
 
@@ -48,7 +48,7 @@ public class XC5200Family extends ChipFamily {
 			// if the clock input is connected, use that as the "user" clock. if nothing is
 			// connected, use the internal RC osciallator instead
 			final Map<String, String> params = new LinkedHashMap<>();
-			params.put("OSC", inputs.containsKey("C") ? "INTERNAL" : "USER");
+			params.put("OSC", inputs.containsKey("C") ? "USER" : "INTERNAL");
 			// outputs are virtual, with their name encoding the divider. allocate them to
 			// either OSC1 or OSC2, whichever supports the desired divider.
 			final Map<String, String> realOutputs = new LinkedHashMap<>();

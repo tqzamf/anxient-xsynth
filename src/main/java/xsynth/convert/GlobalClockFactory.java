@@ -18,7 +18,7 @@ public class GlobalClockFactory implements CustomGateFactory {
 
 	@Override
 	public List<String> getInputs() {
-		return List.of("gclk");
+		return List.of("C");
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class GlobalClockFactory implements CustomGateFactory {
 
 	@Override
 	public List<String> getRequiredSignals() {
-		return List.of("gclk");
+		return List.of("C");
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class GlobalClockFactory implements CustomGateFactory {
 		@Override
 		public void implement(final XnfNetlist xnf, final Namespace ns, final Map<String, Name> outputs,
 				final Map<String, Name> inputs) {
-			xnf.addBuffer("BUF", ns.getSpecial(SpecialName.GCLK), inputs.get("gclk"));
+			xnf.addBuffer("BUF", ns.getSpecial(SpecialName.GCLK), inputs.get("C"));
 		}
 	}
 }

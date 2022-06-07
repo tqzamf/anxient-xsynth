@@ -37,7 +37,7 @@ PIN,T,I,odtristate
 PIN,O,O,trisinput/PAD
 PIN,I,I,GND
 END
-SYM,odinput/PAD/SYM,PULLUP,LIBVER=2.0.0
+SYM,odinput/PAD/PULLUP,PULLUP,LIBVER=2.0.0
 PIN,O,O,odinput/PAD
 END
 SYM,odinput,IBUF,LIBVER=2.0.0

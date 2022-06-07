@@ -1,0 +1,4 @@
+.model unbuf
+.buffer gclk wire null nil
+.names wire
+.pad P1 o=wire

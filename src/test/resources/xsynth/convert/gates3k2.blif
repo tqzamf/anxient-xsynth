@@ -1,0 +1,7 @@
+.model gates3k
+.gate osc o=clock
+.buffer aclk clock
+.names toggle d
+0 1
+.latch d toggle re clock 3
+.pad P1 o=toggle

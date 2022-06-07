@@ -65,6 +65,15 @@ public class BlifModel {
 		} else
 			outputs = inferredOutputs;
 
+		// specifying a buffer for a signal that doesn't even exist isn't problematic,
+		// but probably not what was intended and can be *very* confusing if some signal
+		// isn't buffered because of a typo
+		final Set<String> unusedBuffers = new HashSet<>(buffers.keySet());
+		unusedBuffers.removeAll(driver.keySet());
+		if (!unusedBuffers.isEmpty())
+			for (final String signal : unusedBuffers)
+				diag.warn(sloc, "unused buffer " + buffers.get(signal) + " for signal " + signal);
+
 		// if a .clock is specified, then it will be treated as a clock input and thus
 		// cannot be *generated* by the circuit itself
 		AbortedException err = null;
