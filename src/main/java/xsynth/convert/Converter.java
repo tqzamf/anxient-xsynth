@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,9 +38,12 @@ public class Converter {
 	private final BlifParser reader;
 	private final Namespace root;
 	private final XnfNetlist xnf;
+	private final boolean mergeToplevelNamespaces;
 
-	public Converter(final Diagnostics diag, final ChipFamily family, final boolean qualifyAllNames) {
+	public Converter(final Diagnostics diag, final ChipFamily family, final boolean qualifyAllNames,
+			final boolean mergeToplevelNamespaces) {
 		this.diag = diag;
+		this.mergeToplevelNamespaces = mergeToplevelNamespaces;
 		reader = new BlifParser(diag, family.getCustomGates(), family.getBufferTypes());
 		root = new Namespace(qualifyAllNames);
 		xnf = new XnfNetlist(family.getMaxGateInputs(), family.hasLatches(), family.hasLatchInitValue());
@@ -47,8 +51,19 @@ public class Converter {
 
 	public void read(final InputStream in, final String filename) throws IOException, AbortedException {
 		final BlifModel model = reader.parse(in, filename);
+		final Set<String> outputs;
+		final Set<String> inputs;
+		if (mergeToplevelNamespaces) {
+			// if the toplevel namespaces are merged, simply assume that *all* signals in
+			// the model are ports
+			outputs = model.getDrivers();
+			inputs = model.getConsumers();
+		} else {
+			outputs = model.getOutputs();
+			inputs = model.getInputs();
+		}
 		AbortedException err = null;
-		for (final String out : model.getOutputs())
+		for (final String out : outputs)
 			if (drivers.containsKey(out)) {
 				final BlifModel driver = drivers.get(out);
 				err = diag.error(model.getSourceLocation(), "global signal " + out + " has multiple drivers");
@@ -57,12 +72,12 @@ public class Converter {
 				drivers.put(out, model);
 		if (err != null)
 			throw err;
-		for (final String i : model.getInputs())
+		for (final String i : inputs)
 			consumers.put(i, model);
 
-		final List<String> ports = new ArrayList<>();
-		ports.addAll(model.getInputs());
-		ports.addAll(model.getOutputs());
+		final Set<String> ports = new LinkedHashSet<>();
+		ports.addAll(inputs);
+		ports.addAll(outputs);
 		final Namespace ns = root.getNamespace(model.getName(), ports);
 		for (final BlifGate gate : model.getGates())
 			if (gate instanceof final SumOfProducts sop)

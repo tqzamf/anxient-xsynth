@@ -113,6 +113,10 @@ public class BlifModel {
 		return inputs;
 	}
 
+	public Set<String> getConsumers() {
+		return consumers.keySet();
+	}
+
 	public void addOutputs(final List<String> names) {
 		if (outputs == null)
 			outputs = new HashSet<>();
@@ -121,6 +125,10 @@ public class BlifModel {
 
 	public Set<String> getOutputs() {
 		return outputs;
+	}
+
+	public Set<String> getDrivers() {
+		return driver.keySet();
 	}
 
 	public void addClocks(final List<String> names) {

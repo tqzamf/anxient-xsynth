@@ -101,7 +101,7 @@ public class ConverterTest {
 	@Test
 	public void testMerge() throws IOException, AbortedException {
 		final DiagnosticsShim diag = new DiagnosticsShim();
-		final Converter converter = new Converter(diag, ChipFamily.forPart("2064pd48-50"), false);
+		final Converter converter = new Converter(diag, ChipFamily.forPart("2064pd48-50"), false, false);
 		converter.read(getClass().getResourceAsStream("blinker.blif"), "blinker.blif");
 		converter.read(getClass().getResourceAsStream("blinkerio.blif"), "blinkerio.blif");
 		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
@@ -115,9 +115,27 @@ public class ConverterTest {
 	}
 
 	@Test
+	public void testMergeToplevelNamespaces() throws IOException, AbortedException {
+		final DiagnosticsShim diag = new DiagnosticsShim();
+		final Converter converter = new Converter(diag, ChipFamily.forPart("2064pd48-50"), false, true);
+		converter.read(getClass().getResourceAsStream("blinker.blif"), "blinker.blif");
+		converter.read(getClass().getResourceAsStream("blinkerio.blif"), "blinkerio.blif");
+		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+			converter.writeTo(buffer, "2064pd48-50", List.of("--testcase", "merge-toplevel-namespaces"));
+			XnfWriterTest.assertIdenticalXnf(getClass(), "blinker-mergedns.xnf", buffer);
+		}
+		// 1 warning about the undrinve global reset signal
+		// 2 infos about _LOGIC0 (create by iverilog's tgt-blif) being unused
+		// 1 additional info about the *global* signal _LOGIC0 being unused (it is
+		// promoted to a global signal by)
+		// 1 info about blinkerio being implicitly named
+		diag.assertNumMessages(0, 1, 4);
+	}
+
+	@Test
 	public void testMergeMultipleDrivers() throws IOException, AbortedException {
 		final DiagnosticsShim diag = new DiagnosticsShim();
-		final Converter converter = new Converter(diag, ChipFamily.forPart("2064pd48-50"), false);
+		final Converter converter = new Converter(diag, ChipFamily.forPart("2064pd48-50"), false, false);
 		converter.read(getClass().getResourceAsStream("driver1.blif"), "driver1.blif");
 		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
 			assertThrows(AbortedException.class,
@@ -144,7 +162,7 @@ public class ConverterTest {
 
 	private DiagnosticsShim assertThrowsAbortedException(final String part, final String filename) throws IOException {
 		final DiagnosticsShim diag = new DiagnosticsShim();
-		final Converter converter = new Converter(diag, ChipFamily.forPart(part), false);
+		final Converter converter = new Converter(diag, ChipFamily.forPart(part), false, false);
 		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
 			assertThrows(AbortedException.class,
 					() -> converter.read(getClass().getResourceAsStream(filename), filename));
@@ -159,11 +177,10 @@ public class ConverterTest {
 	private DiagnosticsShim convert(final String part, final String infile, final String outfile)
 			throws IOException, AbortedException {
 		final DiagnosticsShim diag = new DiagnosticsShim();
-		final Converter converter = new Converter(diag, ChipFamily.forPart(part), false);
+		final Converter converter = new Converter(diag, ChipFamily.forPart(part), false, false);
 		converter.read(getClass().getResourceAsStream(infile + ".blif"), infile + ".blif");
 		try (final ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
 			converter.writeTo(buffer, part, List.of("--testcase", infile));
-			buffer.writeTo(System.out);
 			XnfWriterTest.assertIdenticalXnf(getClass(), outfile + ".xnf", buffer);
 		}
 		return diag;
