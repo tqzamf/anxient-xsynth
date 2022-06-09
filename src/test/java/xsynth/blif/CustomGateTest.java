@@ -27,14 +27,14 @@ public class CustomGateTest {
 
 	@Test
 	public void testCustomGate() throws IOException, AbortedException {
-		parseGate(List.of("i"), List.of("o"), List.of(), List.of(), ".gate testgate i=in o=out");
-		assertIO(Map.of("i", "in"), Map.of("o", "out"));
+		parseGate(List.of("I"), List.of("O"), List.of(), List.of(), ".gate testgate i=in o=out");
+		assertIO(Map.of("I", "in"), Map.of("O", "out"));
 		assertEquals(List.of(), gate.getFlags());
 		diag.assertNoMessages();
 
 		// if there are no required pins, then it's fine to have no connections.
 		// this can actually be useful to instantiate eg. RDBK with default values.
-		parseGate(List.of("i"), List.of("o"), List.of(), List.of(), ".gate testgate");
+		parseGate(List.of("I"), List.of("O"), List.of(), List.of(), ".gate testgate");
 		assertIO(Map.of(), Map.of());
 		assertEquals(List.of(), gate.getFlags());
 		diag.assertNoMessages();
@@ -46,10 +46,10 @@ public class CustomGateTest {
 		//   contain an equals sign, making it a stupid but legal BLIF name.
 		// - flags can be everywhere (though for readability, they probably shouldn't.)
 		// - optional flags and pins can simply be omitted
-		parseGate(List.of("a", "b", "c", "d"), List.of("y", "z", "w"), List.of("a", "b", "c", "y", "z"),
-				List.of("and", "or", "xor"), ".gate TESTgate and a=a B=BAr OR c=cat y=Z z==z=");
-		assertIO(Map.of("a", "a", "b", "BAr", "c", "cat"), Map.of("y", "Z", "z", "=z="));
-		assertEquals(List.of("and", "or"), gate.getFlags());
+		parseGate(List.of("A", "B", "C", "D"), List.of("Y", "Z", "W"), List.of("A", "B", "C", "Y", "Z"),
+				List.of("AND", "OR", "XOR"), ".gate TESTgate and a=a B=BAr OR c=cat y=Z z==z=");
+		assertIO(Map.of("A", "a", "B", "BAr", "C", "cat"), Map.of("Y", "Z", "Z", "=z="));
+		assertEquals(List.of("AND", "OR"), gate.getFlags());
 		diag.assertNoMessages();
 	}
 
@@ -62,33 +62,33 @@ public class CustomGateTest {
 		// names are invariably specified in uppercase.
 		parsePad(".pad p15 i=in o=out t=tris fast");
 		assertEquals("P15", gate.getName());
-		assertIO(Map.of("o", "out", "t", "tris"), Map.of("i", "in"));
-		assertEquals(List.of("fast"), gate.getFlags());
+		assertIO(Map.of("O", "out", "T", "tris"), Map.of("I", "in"));
+		assertEquals(List.of("FAST"), gate.getFlags());
 		diag.assertNoMessages();
 
 		// the useful combinations are: input, output, tri-state output, and tri-state
 		// output with input
 		parsePad(".pad P12 i=clk");
-		assertIO(Map.of(), Map.of("i", "clk"));
+		assertIO(Map.of(), Map.of("I", "clk"));
 		assertEquals(List.of(), gate.getFlags());
 		diag.assertNoMessages();
 		parsePad(".pad P12 o=clk");
-		assertIO(Map.of("o", "clk"), Map.of());
+		assertIO(Map.of("O", "clk"), Map.of());
 		assertEquals(List.of(), gate.getFlags());
 		diag.assertNoMessages();
 		parsePad(".pad P12 o=bar t=tri");
-		assertIO(Map.of("t", "tri", "o", "bar"), Map.of());
+		assertIO(Map.of("T", "tri", "O", "bar"), Map.of());
 		assertEquals(List.of(), gate.getFlags());
 		diag.assertNoMessages();
 		parsePad(".pad P12 i=foo o=bar t=tri");
-		assertIO(Map.of("t", "tri", "o", "bar"), Map.of("i", "foo"));
+		assertIO(Map.of("T", "tri", "O", "bar"), Map.of("I", "foo"));
 		assertEquals(List.of(), gate.getFlags());
 		diag.assertNoMessages();
 		// output with pin feedback isn't terribly useful. except maybe to detect when a
 		// pin is being overdriven, to turn off the driver in that case
 		parsePad(".pad P12 i=foo o=bar slow");
-		assertIO(Map.of("o", "bar"), Map.of("i", "foo"));
-		assertEquals(List.of("slow"), gate.getFlags());
+		assertIO(Map.of("O", "bar"), Map.of("I", "foo"));
+		assertEquals(List.of("SLOW"), gate.getFlags());
 		diag.assertNoMessages();
 		// the semantics aren't handled in the parser, so cannot be tested here. for
 		// example, not specifying any connections is illegal, as is connecting the
@@ -107,23 +107,23 @@ public class CustomGateTest {
 	@Test
 	public void testIllegalGate() throws IOException, AbortedException {
 		// gate name missing or gate isn't declared
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of(), List.of(), ".gate");
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of(), List.of(), ".gate gatetest");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of(), List.of(), ".gate");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of(), List.of(), ".gate gatetest");
 		// invalid pin and flag names
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of(), List.of(), ".gate testgate i=o o=i a=b");
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of(), List.of(), ".gate testgate c=d");
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of(), List.of(), ".gate testgate nor");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of(), List.of(), ".gate testgate i=o o=i a=b");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of(), List.of(), ".gate testgate c=d");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of(), List.of(), ".gate testgate nor");
 		assertParseDiagnostics(1, 0, 0, List.of(), List.of(), List.of(), List.of("nand"), ".gate testgate nor");
 		// connecting the same pin twice
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of(), List.of(), ".gate testgate i=o i=i");
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of(), List.of(), ".gate testgate o=i o=o");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of(), List.of(), ".gate testgate i=o i=i");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of(), List.of(), ".gate testgate o=i o=o");
 		// not connecting a requried pin
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of("i"), List.of(), ".gate testgate o=i");
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o"), List.of("o"), List.of(), ".gate testgate i=o");
-		assertParseDiagnostics(1, 0, 0, List.of("i", "q"), List.of("o"), List.of("q"), List.of(), ".gate testgate i=o");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of("I"), List.of(), ".gate testgate o=i");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O"), List.of("O"), List.of(), ".gate testgate i=o");
+		assertParseDiagnostics(1, 0, 0, List.of("I", "Q"), List.of("O"), List.of("Q"), List.of(), ".gate testgate i=o");
 		// empty pin or signal name
 		assertParseDiagnostics(1, 0, 0, List.of(""), List.of(), List.of(), List.of(), ".gate testgate =o");
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of(), List.of(), List.of(), ".gate testgate i=");
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of(), List.of(), List.of(), ".gate testgate i=");
 		assertParseDiagnostics(2, 0, 0, List.of(""), List.of(), List.of(), List.of(), ".gate testgate =");
 		// there is no "junk at the end" case because that junk is just considered a
 		// funnily-named (and probably undefined) flag
@@ -132,10 +132,10 @@ public class CustomGateTest {
 	@Test
 	public void testDuplicateDriver() throws IOException, AbortedException {
 		// it's an error to connect multiple outputs to the same net
-		assertParseDiagnostics(1, 0, 0, List.of("i"), List.of("o", "q"), List.of(), List.of(),
+		assertParseDiagnostics(1, 0, 0, List.of("I"), List.of("O", "Q"), List.of(), List.of(),
 				".gate testgate i=a o=b q=b");
 		// but two inputs can be tied together
-		assertParseDiagnostics(0, 0, 0, List.of("a", "b"), List.of("o"), List.of(), List.of(),
+		assertParseDiagnostics(0, 0, 0, List.of("A", "B"), List.of("O"), List.of(), List.of(),
 				".gate testgate a=i b=i o=q");
 	}
 
@@ -156,7 +156,7 @@ public class CustomGateTest {
 	}
 
 	private void parsePad(final String decl) throws IOException, AbortedException {
-		parse(CustomGateFactory.IOPAD_GATE, List.of("o", "t"), List.of("i"), List.of(), List.of("fast", "slow"), decl);
+		parse(CustomGateFactory.IOPAD_GATE, List.of("O", "T"), List.of("I"), List.of(), List.of("FAST", "SLOW"), decl);
 	}
 
 	private void parse(final String gatename, final List<String> inputs, final List<String> outputs,

@@ -33,7 +33,7 @@ public class ChipFamily {
 		customGates.put(CustomGateFactory.IOPAD_GATE,
 				new PadFactory(slewRateControl, resistors, hasNoDelay, hasDriverType));
 		customGates.put(CustomGateFactory.LATCH_CLOCK_GATE, new GlobalClockFactory());
-		pattern = Pattern.compile("^(?:xc)?" + regex + ".*", Pattern.CASE_INSENSITIVE);
+		pattern = Pattern.compile("^" + regex + ".*", Pattern.CASE_INSENSITIVE);
 		bufferTypes.add("BUFG"); // supported by all chips
 	}
 

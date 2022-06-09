@@ -1,6 +1,6 @@
 LCANET,6
 PROG,xsynth,0.0.1,"converted and verified to be correct"
-PART,xc3030avg100-7
+PART,3030avg100-7
 PWR,0,GND
 PWR,1,VCC
 SYM,normal/PROD,AND,LIBVER=2.0.0

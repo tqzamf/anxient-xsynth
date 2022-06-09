@@ -18,7 +18,7 @@ import xsynth.xnf.XnfWriterTest;
 public class ConverterTest {
 	@Test
 	public void testSumOfProducts() throws IOException, AbortedException {
-		final DiagnosticsShim diag = convert("xc3030avg100-7", "sop");
+		final DiagnosticsShim diag = convert("3030avg100-7", "sop");
 		// two warnings regarding undriven global inputs
 		// one info listing all the unused global outputs
 		diag.assertNumMessages(0, 2, 1);
@@ -26,14 +26,14 @@ public class ConverterTest {
 
 	@Test
 	public void testSumOfProductsConstants() throws IOException, AbortedException {
-		final DiagnosticsShim diag = convert("xc3030avg100-7", "constants");
+		final DiagnosticsShim diag = convert("3030avg100-7", "constants");
 		// one info listing the unused global outputs
 		diag.assertNumMessages(0, 0, 1);
 	}
 
 	@Test
 	public void testSumOfProductsInversion() throws IOException, AbortedException {
-		final DiagnosticsShim diag = convert("xc3030avg100-7", "invert");
+		final DiagnosticsShim diag = convert("3030avg100-7", "invert");
 		// two warnings regarding undriven global inputs
 		// one info listing all the unused global outputs
 		diag.assertNumMessages(0, 2, 1);
@@ -41,7 +41,7 @@ public class ConverterTest {
 
 	@Test
 	public void testLatches() throws IOException, AbortedException {
-		final DiagnosticsShim diag = convert("xc2064pd48-50", "latches");
+		final DiagnosticsShim diag = convert("2064pd48-50", "latches");
 		// two warnings regarding undriven global inputs
 		// one info listing all the unused global outputs
 		diag.assertNumMessages(0, 2, 1);
@@ -49,7 +49,7 @@ public class ConverterTest {
 
 	@Test
 	public void testLatchGlobalClock() throws IOException, AbortedException {
-		final DiagnosticsShim diag = convert("xc3030avg100-7", "gclk");
+		final DiagnosticsShim diag = convert("3030avg100-7", "gclk");
 		// two warnings regarding undriven global inputs
 		// one info listing all the unused global outputs
 		diag.assertNumMessages(0, 2, 1);

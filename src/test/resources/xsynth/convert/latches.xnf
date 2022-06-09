@@ -1,6 +1,6 @@
 LCANET,6
 PROG,xsynth,0.0.1,"looks good"
-PART,xc2064pd48-50
+PART,2064pd48-50
 PWR,0,GND
 SYM,ff_rising,DFF,LIBVER=2.0.0
 PIN,C,I,clock
