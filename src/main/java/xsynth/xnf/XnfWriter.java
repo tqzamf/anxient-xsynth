@@ -9,12 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import xsynth.XSynth;
 import xsynth.naming.Namespace;
 import xsynth.naming.SpecialName;
 
 public class XnfWriter implements AutoCloseable {
-	private static final String VERSION = "0.0.1";
-
 	private final OutputStream xnf;
 
 	public XnfWriter(final OutputStream xnf) {
@@ -28,7 +27,7 @@ public class XnfWriter implements AutoCloseable {
 			comment.append(' ').append(cmd);
 		comment.append('"');
 		writeRecord(RecordType.LCANET, Map.of(), "6");
-		writeRecord(RecordType.PROG, Map.of(), "xsynth", VERSION, comment.toString());
+		writeRecord(RecordType.PROG, Map.of(), "XSynth", XSynth.getVersion(), comment.toString());
 		if (part != null)
 			writeRecord(RecordType.PART, Map.of(), part);
 		writePower(ns, "0", SpecialName.GND);
