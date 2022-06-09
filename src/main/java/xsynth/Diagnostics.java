@@ -3,8 +3,18 @@ package xsynth;
 import java.util.List;
 
 public class Diagnostics {
+	private boolean quiet;
+
+	public boolean isQuiet() {
+		return quiet;
+	}
+
+	public void setQuiet(final boolean quiet) {
+		this.quiet = quiet;
+	}
+
 	protected void print(final String level, final SourceLocation sloc, final List<String> line, final String message) {
-		System.err.println(sloc + ": " + level + " " + message);
+		System.err.println((sloc != null ? sloc + ": " : "") + level + " " + message);
 		if (line != null)
 			System.err.println("\t" + String.join(" ", line));
 	}
@@ -14,7 +24,8 @@ public class Diagnostics {
 	 * output. Use when there's something syntactically wrong with the line.
 	 */
 	public void info(final SourceLocation sloc, final List<String> line, final String message) {
-		print("INFO", sloc, line, message);
+		if (!quiet)
+			print("INFO", sloc, line, message);
 	}
 
 	/**
@@ -71,7 +82,7 @@ public class Diagnostics {
 	 */
 	@SuppressWarnings("serial")
 	public static class AbortedException extends Exception {
-		private AbortedException(final SourceLocation sloc, final String message) {
+		AbortedException(final SourceLocation sloc, final String message) {
 			super("aborted at " + sloc + ": " + message);
 		}
 	}

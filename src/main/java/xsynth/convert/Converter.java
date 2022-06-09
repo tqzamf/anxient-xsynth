@@ -1,5 +1,6 @@
 package xsynth.convert;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,6 +48,12 @@ public class Converter {
 		reader = new BlifParser(diag, family.getCustomGates(), family.getBufferTypes());
 		root = new Namespace(qualifyAllNames);
 		xnf = new XnfNetlist(family.getMaxGateInputs(), family.hasLatches(), family.hasLatchInitValue());
+	}
+
+	public void read(final String filename) throws IOException, AbortedException {
+		try (final InputStream in = new FileInputStream(filename)) {
+			read(in, filename);
+		}
 	}
 
 	public void read(final InputStream in, final String filename) throws IOException, AbortedException {
