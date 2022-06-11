@@ -92,6 +92,10 @@ public class PadFactory implements CustomGateFactory {
 			// just connect the signal to both pins (o and t) for an open-drain output. or
 			// to explicitly connect o=GND; all that takes is a ".names GND" to define it.
 			diag.warn(sloc, "tristate but no output value, creating an open drain output");
+		if (input && output && !tristate)
+			// input on an output that is always enabled. this means the input always reads
+			// the output value, and probably isn't what the user intended.
+			diag.warn(sloc, "input on non-tristate output will always read back the output value");
 
 		final List<String> xflags = new ArrayList<>();
 		setFlags(xflags, "speed", flags, SPEEDS);

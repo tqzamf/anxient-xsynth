@@ -59,11 +59,11 @@ public class ConverterTest {
 	@MethodSource("getPadTestPairs")
 	public void testPads(final String part, final String filename) throws IOException, AbortedException {
 		final DiagnosticsShim diag = convert(part, filename, filename);
-		// two of the pads have a connection to t but not o, which generates a warning
-		// message
+		// two of the pads have a connection to t but not o; one pad has i and o but
+		// not t. either condition generates a warning message
 		// plus 6 warnings regarding undriven global inputs
 		// plus one info listing all the unused global outputs
-		diag.assertNumMessages(0, 8, 1);
+		diag.assertNumMessages(0, 9, 1);
 	}
 
 	public static String[][] getPadTestPairs() {
