@@ -91,16 +91,14 @@ datasheet, usually something like `P4` in PDIP, PLCC or QFP packages, but alphan
 are specified like BLIF gate connections, ie. `i=input` connects the signal `input` to gate port `i` (or in this case,
 the signal coming from the pin). note that BLIF signal names are case-sensitive; the IO pad's ports and flags aren't.
 
-+-------------------+---------------------------------------+--------------+---------------+---------------------------+
 | pin type          | syntax                                | input signal | output signal | tristate control signal   |
-+-------------------+---------------------------------------+--------------+---------------+---------------------------+
+|-------------------|---------------------------------------|--------------|---------------|---------------------------|
 | input only        | `.pad Px i=input`                     | `input`      | none          | logic 1 (driver disabled) | 
 | output only       | `.pad Px o=output`                    | none         | `output`      | logic 0 (driver enabled)  |
 | tristate output   | `.pad Px o=output t=tristate`         | none         | `output`      | `tristate`                |
 | tristate IO       | `.pad Px i=input o=output t=tristate` | `input`      | `output`      | `tristate`                |
 | open-drain output | `.pad Px o=output t=output`           | none         | `output`      | `output`                  |
 | open-drain IO     | `.pad Px i=input o=output t=output`   | `input`      | `output`      | `output`                  |
-+-------------------+---------------------------------------+--------------+---------------+---------------------------+
 
 the tristate control signal `t` controls whether the output drivers are enabled. it is active high, that is, the output
 drivers are disabled if the tristate control signal is high, and enabled if the tristate control signal is low. it can
@@ -125,12 +123,10 @@ into an open-drain output, along with an accompanying warning.
 
 the valid flags are as documented in the device datasheet:
 
-+----------------------+--------+----------+--------+-------------------------------------------------------------+
 | flags                | XC2000 | XC3000   | XC5200 | function                                                    |
-+----------------------+--------+----------+--------+-------------------------------------------------------------+
+|----------------------|--------|----------|--------|-------------------------------------------------------------|
 | `fast`, `slow`       | —      | ✓        | ✓      | sets output slew rate; `slow` is the default                |
 | `pullup`, `pulldown` | —      | `pullup` | ✓      | enable pullup / pulldown resistor on the pin (default none) |
-+----------------------+--------+----------+--------+-------------------------------------------------------------+
 
 here, XC3000 stands for the the XC3000, XC3100, XC3000A and XC3100A families.
 
