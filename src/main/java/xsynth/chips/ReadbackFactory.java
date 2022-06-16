@@ -7,8 +7,8 @@ import java.util.Map;
 import xsynth.Diagnostics;
 import xsynth.Diagnostics.AbortedException;
 import xsynth.SourceLocation;
+import xsynth.blif.CustomGate;
 import xsynth.convert.SpecialGateFactory;
-import xsynth.convert.XnfCustomGate;
 import xsynth.naming.Name;
 import xsynth.naming.Namespace;
 import xsynth.xnf.PinDirection;
@@ -22,10 +22,10 @@ public class ReadbackFactory extends SpecialGateFactory {
 	}
 
 	@Override
-	public XnfCustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
+	public List<CustomGate> newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
 			final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs)
 			throws AbortedException {
-		return new SpecialGate(name, outputs, inputs) {
+		return List.of(new SpecialGate(name, outputs, inputs) {
 			@Override
 			public void implement(final XnfNetlist xnf, final Namespace ns, final Map<String, Name> outputs,
 					final Map<String, Name> inputs) {
@@ -41,6 +41,6 @@ public class ReadbackFactory extends SpecialGateFactory {
 					gate.allocateName();
 				}
 			}
-		};
+		});
 	}
 }

@@ -1,0 +1,31 @@
+.model ram4k
+# asynchronous RAM, without WCLK
+# unused address inputs are tied low
+.gate ram a0=a0 a1=a1 a2=a2 we=we d=d0 o=dout_async
+# synchronous RAM, with wclk
+# specifying numbered data inputs and outputs creates a larger RAM
+.gate rams a0=a0 a1=a1 a2=a2 a3=a3 a4=a4 we=we d0=d0 d1=d1 d2=d2 o0=dout_sync0 o1=dout_sync1 o2=dout_sync2 wclk=wck
+# and synchronous, dual-ported RAM
+# for inexplicable reasons, the first output port is renamed SPO instead of O
+.gate ramd a0=a0 a1=a1 a2=a2 a3=a3 we=we d0=d0 spo0=dout_a dpo0=dout_b wclk=wck dpra0=b0 dpra1=b1 dpra2=b2 dpra3=b3
+# wire everything to pins to avoid warnings
+.pad p4 i=a0
+.pad p5 i=a1
+.pad p6 i=a2
+.pad p7 i=a3
+.pad p8 i=a4
+.pad p9 i=b0
+.pad p10 i=b1
+.pad p11 i=b2
+.pad p12 i=b3
+.pad p13 i=d0
+.pad p14 i=d1
+.pad p15 i=d2
+.pad p16 i=we
+.pad p17 i=wck
+.pad p18 o=dout_async
+.pad p19 o=dout_sync0
+.pad p20 o=dout_sync1
+.pad p21 o=dout_sync2
+.pad p22 o=dout_a
+.pad p23 o=dout_b

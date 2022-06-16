@@ -1,0 +1,17 @@
+.model ram4k
+# a RAM with weird connections that is, however, still valid
+# this generates tons of warnings, though
+# bit 0 is removed beccause it's write-only
+# bit 1 and 2 have all inputs tied low
+# bit 3 is created normally, because only one of its outputs is unused
+.gate ramd a0=a0 a3=a3 we=we d0=d0 spo1=zero_a dpo2=zero_b d3=d3 spo3=q3 wclk=wck dpra2=b2
+# wire everything to pins to avoid warnings
+.pad p4 i=a0
+.pad p7 i=a3
+.pad p11 i=b2
+.pad p16 i=we
+.pad p17 i=wck
+.pad p22 o=zero_a
+.pad p23 o=zero_b
+.pad p24 i=d3
+.pad p25 o=q3

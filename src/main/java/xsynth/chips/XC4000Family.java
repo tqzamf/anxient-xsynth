@@ -21,5 +21,12 @@ public class XC4000Family extends ChipFamily {
 				List.of("GSR", "GTS", "CLK"), List.of()));
 		customGates.put("OSC4", new SpecialGateFactory(List.of("F8M", "F500K", "F16K", "F490", "F15"), //
 				List.of(), List.of()));
+		customGates.put("RAM", new RAMFactory(List.of("O"), List.of("A"), false, 5));
+		// onlx XC4000E (and derivatives) have synchronous and dual-port RAM, but it's
+		// easier not to make this two separate chips. XACTstep will always complain
+		// about RAMS and RAMD because it doesn't support XC4000E; Alliance or ISE
+		// should complain if targeting a non-E XC4000.
+		customGates.put("RAMS", new RAMFactory(List.of("O"), List.of("A"), true, 5));
+		customGates.put("RAMD", new RAMFactory(List.of("SPO", "DPO"), List.of("A", "DPRA"), true, 4));
 	}
 }

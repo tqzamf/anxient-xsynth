@@ -103,7 +103,8 @@ public class BlifParser {
 			}
 			default -> {
 				try {
-					model.addGate(parseGate(sloc, decl, line));
+					for (final BlifGate gate : parseGate(sloc, decl, line))
+						model.addGate(gate);
 				} catch (final IllegalArgumentException e) {
 					throw diag.error(sloc, e.getMessage());
 				}
@@ -169,14 +170,14 @@ public class BlifParser {
 		return names;
 	}
 
-	private BlifGate parseGate(final SourceLocation sloc, final String decl, final List<String> line)
+	private List<? extends BlifGate> parseGate(final SourceLocation sloc, final String decl, final List<String> line)
 			throws AbortedException {
 		return switch (decl) {
 		case ".names" -> {
 			if (line.size() < 2)
 				throw diag.error(sloc, line, "illegal .names declaration");
 			sop = new SumOfProducts(line.get(line.size() - 1), parseNameList(line, 1, 1));
-			yield sop;
+			yield List.of(sop);
 		}
 
 		case ".latch" -> {
@@ -205,7 +206,7 @@ public class BlifParser {
 			if (line.size() > pos)
 				throw diag.error(sloc, line, "trailing garbage in .latch declaration");
 			try {
-				yield new Latch(output, input, latchtype, clock, initval);
+				yield List.of(new Latch(output, input, latchtype, clock, initval));
 			} catch (final IllegalArgumentException e) {
 				throw diag.error(sloc, line, e.getMessage());
 			}
@@ -230,8 +231,8 @@ public class BlifParser {
 		};
 	}
 
-	private CustomGate parseCustomGate(final SourceLocation sloc, final CustomGateFactory factory, final String name,
-			final List<String> line) throws AbortedException {
+	private List<CustomGate> parseCustomGate(final SourceLocation sloc, final CustomGateFactory factory,
+			final String name, final List<String> line) throws AbortedException {
 		final Map<String, String> inputs = new LinkedHashMap<>();
 		final Map<String, String> outputs = new LinkedHashMap<>();
 		final List<String> flags = new ArrayList<>();

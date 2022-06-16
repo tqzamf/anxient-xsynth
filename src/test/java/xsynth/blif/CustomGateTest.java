@@ -191,10 +191,10 @@ public class CustomGateTest {
 		}
 
 		@Override
-		public CustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
+		public List<CustomGate> newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
 				final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs)
 				throws AbortedException {
-			return new CustomGateShim(name, flags, inputs, outputs);
+			return List.of(new CustomGateShim(name, flags, inputs, outputs));
 		}
 
 		@Override

@@ -37,13 +37,13 @@ public class GlobalClockFactory implements CustomGateFactory {
 	}
 
 	@Override
-	public CustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String loc,
+	public List<CustomGate> newInstance(final Diagnostics diag, final SourceLocation sloc, final String loc,
 			final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs) {
-		return new Pad(inputs, outputs);
+		return List.of(new GCLK(inputs, outputs));
 	}
 
-	private class Pad extends XnfCustomGate {
-		public Pad(final Map<String, String> inputs, final Map<String, String> outputs) {
+	private class GCLK extends XnfCustomGate {
+		public GCLK(final Map<String, String> inputs, final Map<String, String> outputs) {
 			super(null, outputs, inputs);
 		}
 

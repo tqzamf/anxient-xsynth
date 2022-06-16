@@ -88,6 +88,7 @@ public class ConverterTest {
 				{ "3195apc84-2", "gates3k1", "gates3k1" }, //
 				{ "3195apc84-2", "gates3k2", "gates3k2" }, //
 				{ "4003hpq208-5", "gates4k", "gates4k" }, //
+				{ "4003epq100-5", "ram4k", "ram4k" }, //
 				{ "5202pq100-5", "gates5k2", "gates5k2" }, //
 				{ "5202pq100-5", "gates5k2rdclk", "gates5k2rdclk" } };
 	}
@@ -96,6 +97,20 @@ public class ConverterTest {
 	public void testXC5200ConflictingDividers() throws IOException, AbortedException {
 		final DiagnosticsShim diag = assertThrowsAbortedException("5202pq100-5", "gates5k2div.blif");
 		// 1 error about the two clocks having to use the same divider output
+		diag.assertNumMessages(1, 0, 0);
+	}
+
+	@Test
+	public void testXC4000RAM() throws IOException, AbortedException {
+		DiagnosticsShim diag = convert("4003epq100-5", "weirdram4k", "weirdram4k");
+		// 2 warnings about DPRA0 and DPRA1 being unconnected
+		// 2 warnings about A1 and A2 being unconnected
+		// 2 warnings about D1 and D2 being unconnected
+		// 1 warning about bit 0 (SPO0 / DPO0) being unconnected
+		diag.assertNumMessages(0, 7, 0);
+
+		// here, there's both numbered and unnumbered inputs, which is a hard error
+		diag = assertThrowsAbortedException("4003epq100-5", "badram4k.blif");
 		diag.assertNumMessages(1, 0, 0);
 	}
 

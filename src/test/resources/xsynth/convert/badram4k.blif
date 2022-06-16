@@ -1,0 +1,11 @@
+.model ram4k
+# this is no longer valid because SPO is unnumbered, but D0 and DPO2 are numbered
+# making this RAM 2-bit wide must *not* produce any warnings
+.gate ramd a0=a0 we=we d0=d0 spo=out_a dpo2=out_b wclk=wck dpra0=b0
+# wire everything to pins to avoid warnings
+.pad p4 i=a0
+.pad p5 i=b0
+.pad p16 i=we
+.pad p17 i=wck
+.pad p22 o=out_a
+.pad p23 o=out_b

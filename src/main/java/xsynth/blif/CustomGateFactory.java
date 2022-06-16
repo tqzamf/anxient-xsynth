@@ -17,7 +17,7 @@ public interface CustomGateFactory {
 	/** name of the {@code .gate} used to specify the implicit global gate clock */
 	public static final String LATCH_CLOCK_GATE = "LATCHCLOCK";
 
-	public CustomGate newInstance(final Diagnostics diag, SourceLocation sloc, final String name,
+	public List<CustomGate> newInstance(final Diagnostics diag, SourceLocation sloc, final String name,
 			final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs)
 			throws AbortedException;
 

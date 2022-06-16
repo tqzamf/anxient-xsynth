@@ -75,7 +75,7 @@ public class PadFactory implements CustomGateFactory {
 	}
 
 	@Override
-	public CustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String loc,
+	public List<CustomGate> newInstance(final Diagnostics diag, final SourceLocation sloc, final String loc,
 			final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs)
 			throws AbortedException {
 		final boolean input = outputs.containsKey("I");
@@ -134,7 +134,7 @@ public class PadFactory implements CustomGateFactory {
 		else
 			resistor = null;
 
-		return new Pad(loc, outputs, inputs, padflags, resistor, iflags, oflags);
+		return List.of(new Pad(loc, outputs, inputs, padflags, resistor, iflags, oflags));
 	}
 
 	private void setFlags(final List<String> xflags, final String name, final List<String> flags,

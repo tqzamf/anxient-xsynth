@@ -8,10 +8,10 @@ import java.util.Map;
 import xsynth.Diagnostics;
 import xsynth.Diagnostics.AbortedException;
 import xsynth.SourceLocation;
+import xsynth.blif.CustomGate;
 import xsynth.convert.PadFactory.Resistors;
 import xsynth.convert.PadFactory.SlewRateControl;
 import xsynth.convert.SpecialGateFactory;
-import xsynth.convert.XnfCustomGate;
 
 public class XC5200Family extends ChipFamily {
 	public XC5200Family() {
@@ -29,20 +29,20 @@ public class XC5200Family extends ChipFamily {
 	private static class OSC52 extends SpecialGateFactory {
 		private static int[] DIV1 = { 4, 16, 64, 256 };
 		private static int[] DIV2 = { 2, 8, 32, 128, 1024, 4096, 16384, 65536 };
-		private static List<String> INPUTS = new ArrayList<>();
+		private static List<String> OUTPUTS = new ArrayList<>();
 		static {
 			for (final int factor : DIV1)
-				INPUTS.add("DIV" + factor);
+				OUTPUTS.add("DIV" + factor);
 			for (final int factor : DIV2)
-				INPUTS.add("DIV" + factor);
+				OUTPUTS.add("DIV" + factor);
 		}
 
 		public OSC52() {
-			super(INPUTS, List.of("C"), List.of());
+			super(OUTPUTS, List.of("C"), List.of());
 		}
 
 		@Override
-		public XnfCustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
+		public List<CustomGate> newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
 				final List<String> flags, final Map<String, String> virtualOutputs, final Map<String, String> inputs)
 				throws AbortedException {
 			// if the clock input is connected, use that as the "user" clock. if nothing is
@@ -54,7 +54,7 @@ public class XC5200Family extends ChipFamily {
 			final Map<String, String> realOutputs = new LinkedHashMap<>();
 			allocatePort(diag, sloc, realOutputs, params, "DIVIDE1_BY", virtualOutputs, "OSC1", DIV1);
 			allocatePort(diag, sloc, realOutputs, params, "DIVIDE2_BY", virtualOutputs, "OSC2", DIV2);
-			return new SpecialGate(name, realOutputs, inputs, List.of(), params);
+			return List.of(new SpecialGate(name, realOutputs, inputs, List.of(), params));
 		}
 
 		private void allocatePort(final Diagnostics diag, final SourceLocation sloc,

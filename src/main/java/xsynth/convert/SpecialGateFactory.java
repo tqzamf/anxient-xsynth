@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import xsynth.Diagnostics;
 import xsynth.Diagnostics.AbortedException;
 import xsynth.SourceLocation;
+import xsynth.blif.CustomGate;
 import xsynth.blif.CustomGateFactory;
 import xsynth.naming.Name;
 import xsynth.naming.Namespace;
@@ -62,10 +63,10 @@ public class SpecialGateFactory implements CustomGateFactory {
 	}
 
 	@Override
-	public XnfCustomGate newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
+	public List<CustomGate> newInstance(final Diagnostics diag, final SourceLocation sloc, final String name,
 			final List<String> flags, final Map<String, String> outputs, final Map<String, String> inputs)
 			throws AbortedException {
-		return new SpecialGate(name, outputs, inputs, flags, Map.of());
+		return List.of(new SpecialGate(name, outputs, inputs, flags, Map.of()));
 	}
 
 	protected class SpecialGate extends XnfCustomGate {
