@@ -1,0 +1,14 @@
+.model gates4k
+# clocks are simple in XC4000 (and are the only thing that is simple in that family)
+.gate osc4 f8m=clock8m f15=clock15
+# explicitly drive global reset from a pin
+.pad P4 i=reset ttlcmos o=rstout t=rstout pullup
+.gate startup clk=clock8m gsr=reset
+.pad P5 i=rstout ttl
+# no rdclk with explicit clock 
+.gate rdbk clk=clock15
+# invoke JTAG TAP, redirecting TDO through another chip
+# TDO cannot be connected to anything but the TDO for XC4000
+# TDO1 works properly but TDO2 is just left open
+.gate bscan tdo1=clock15
+.pad P6 o=rstout cmos

@@ -23,20 +23,22 @@ public class SpecialGateFactory implements CustomGateFactory {
 	private final List<String> required;
 	private final Map<String, String> specialInputs = new TreeMap<>();
 	private final Map<String, String> specialOutputs = new TreeMap<>();
+	private final boolean directConnect;
 
 	public SpecialGateFactory(final List<String> outputs, final List<String> inputs, final List<String> required,
-			final List<String> flags, final Map<String, String> specialPadConnections) {
+			final List<String> flags, final Map<String, String> specialPadConnections, final boolean directConnect) {
 		this.outputs = outputs;
 		this.inputs = inputs;
 		this.required = required;
 		this.flags = flags;
+		this.directConnect = directConnect;
 		for (final String special : specialPadConnections.keySet())
 			(inputs.contains(special) ? specialInputs : specialOutputs).put(special,
 					specialPadConnections.get(special));
 	}
 
 	public SpecialGateFactory(final List<String> outputs, final List<String> inputs, final List<String> required) {
-		this(outputs, inputs, required, List.of(), Map.of());
+		this(outputs, inputs, required, List.of(), Map.of(), true /* irrelevant */);
 	}
 
 	@Override
@@ -101,11 +103,20 @@ public class SpecialGateFactory implements CustomGateFactory {
 					final XnfGate pad = xnf.addSymbol(specialPad.get(port), null);
 					final Name wire = ns.getAnonymous(gate.getType() + "_" + port);
 					gate.connect(dir, port, false, wire, null);
+					final Name padWire;
+					if (!directConnect) {
+						padWire = wire.getAnonymous("PAD");
+						if (dir == PinDirection.DRIVER)
+							xnf.addBuffer("OBUF", padWire, wire);
+						else
+							xnf.addBuffer("IBUF", wire, padWire);
+					} else
+						padWire = wire;
 					if (dir == PinDirection.DRIVER) {
-						pad.connect(PinDirection.CONSUMER, "I", false, wire, null);
+						pad.connect(PinDirection.CONSUMER, "O", false, padWire, null);
 						pad.allocateName();
 					} else
-						pad.connect(PinDirection.DRIVER, "O", false, wire, null);
+						pad.connect(PinDirection.DRIVER, "I", false, padWire, null);
 				}
 		}
 	}

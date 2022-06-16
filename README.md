@@ -209,10 +209,20 @@ but that output can only divide by either 4 or 16, not both.
 - Icarus Verilog's `tgt-blif` only ever generates flipflops (no latches). not using the latch capability may be a
   problem for the XC2000 family which is short on resources anyway. for most synchronous designs, flipflops should be
   enough. the XC3x00 / XC3x00A families don't even support latches at all, except for the input latches.
+
+## unsupported chip features
+
 - there is no explicit support for IO flipflops and latches. grafting them onto apparently combinatorial Verilog signals
   isn't very intuitive, so they would have to be autodetected.
 - similarly, the "gate enable" and reset / preset inputs of flipflops aren't supported because there is no way to
   specify them in BLIF. they would also have to be determined from the gate connected to the data input.
+- the various internal tristate buffers aren't used, which makes busses very inefficient. BLIF has no way of
+  representing tristate signals, so these buffers would have to be inferred by strategically replacing multiplexers.
+- the various "fast carry" structures (CY_MUX on XC5200, CY4 on XC4000) aren't supported. they could be matched to a
+  variety of "obvious" carry patterns in the BLIF input.
+- XC4000 RAM has to be specified in the `.io` file, which makes it awkward to use. on the other hand, it can be easily
+  replaced by a discrete SRAM if designed that way. it also cannot be initialized.
+- XC4000 ROM isn't supported at all, however ROMs are easily specified in BLIF or Verilog.
 
 # alternatives
 

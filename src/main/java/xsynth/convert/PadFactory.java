@@ -28,7 +28,8 @@ public class PadFactory implements CustomGateFactory {
 	private static final List<String> SPEEDS = List.of(SPEED_FAST, SPEED_SLOW, SPEED_MEDFAST, SPEED_MEDSLOW);
 	private static final String LEVEL_TTL = "TTL";
 	private static final String LEVEL_CMOS = "CMOS";
-	private static final List<String> LEVELS = List.of(LEVEL_TTL, LEVEL_CMOS);
+	private static final String LEVEL_TTL_CMOS = "TTLCMOS";
+	private static final List<String> LEVELS = List.of(LEVEL_TTL, LEVEL_CMOS, LEVEL_TTL_CMOS);
 	private static final String IMPED_CAP = "CAP";
 	private static final String IMPED_RES = "RES";
 	private static final List<String> IMPEDS = List.of(IMPED_CAP, IMPED_RES);
@@ -48,11 +49,8 @@ public class PadFactory implements CustomGateFactory {
 			flags.add(DELAY_DEFAULT); // for completeness; not actually passed on
 		}
 		if (hasDriverType) {
-			// TODO could support input=TTL, output=CMOS case ("ttlcmos"?)
-			flags.add(LEVEL_TTL);
-			flags.add(LEVEL_CMOS);
-			flags.add(IMPED_CAP);
-			flags.add(IMPED_RES);
+			flags.addAll(LEVELS);
+			flags.addAll(IMPEDS);
 		}
 	}
 
@@ -97,17 +95,35 @@ public class PadFactory implements CustomGateFactory {
 			// the output value, and probably isn't what the user intended.
 			diag.warn(sloc, "input on non-tristate output will always read back the output value");
 
-		final List<String> xflags = new ArrayList<>();
-		setFlags(xflags, "speed", flags, SPEEDS);
-		setFlags(xflags, "level", flags, LEVELS);
-		setFlags(xflags, "impedance", flags, IMPEDS);
+		final List<String> padflags = new ArrayList<>();
+		setFlags(padflags, "speed", flags, SPEEDS);
+		setFlags(padflags, "impedance", flags, IMPEDS);
 
 		// delay is different: there is NODELAY, but no corresponding DELAY. also, it
 		// has to be specified on the IBUF, not on the EXT record.
 		if (flags.contains(DELAY_DEFAULT) && flags.contains(DELAY_NONE))
 			throw diag.error(sloc, "inconsistent delay flags: delay and nodelay");
-		final boolean nodelay = flags.contains(DELAY_NONE);
+		final Map<String, String> iflags = new LinkedHashMap<>();
+		if (flags.contains(DELAY_NONE))
+			iflags.put("NODELAY", null);
+		final Map<String, String> oflags = new LinkedHashMap<>();
 
+		// level flags go on the IBUF / OBUF, not on the pad
+		final String[] levelFlags = flags.stream().filter(LEVELS::contains).toArray(n -> new String[n]);
+		if (levelFlags.length > 1)
+			throw diag.error(sloc, "inconsistent level flags: " + Arrays.toString(levelFlags));
+		if (levelFlags.length > 0) {
+			final String level = levelFlags[0];
+			if (level.equals(LEVEL_TTL_CMOS)) {
+				iflags.put(LEVEL_TTL, null);
+				oflags.put(LEVEL_CMOS, null);
+			} else {
+				iflags.put(level, null);
+				oflags.put(level, null);
+			}
+		}
+
+		// resistors are placed as a component, not specified as a flag
 		if (flags.contains(RESISTOR_PULLDOWN) && flags.contains(RESISTOR_PULLUP))
 			throw diag.error(sloc, "inconsistent resistor flags: pullup and pulldown");
 		final String resistor;
@@ -118,7 +134,7 @@ public class PadFactory implements CustomGateFactory {
 		else
 			resistor = null;
 
-		return new Pad(loc, outputs, inputs, xflags, nodelay, resistor);
+		return new Pad(loc, outputs, inputs, padflags, resistor, iflags, oflags);
 	}
 
 	private void setFlags(final List<String> xflags, final String name, final List<String> flags,
@@ -132,17 +148,17 @@ public class PadFactory implements CustomGateFactory {
 
 	private class Pad extends XnfCustomGate {
 		private final String loc;
-		private final Map<String, String> nodelay;
+		private final Map<String, String> iflags, oflags;
 		private final String resistor;
 
 		public Pad(final String loc, final Map<String, String> outputs, final Map<String, String> inputs,
-				final List<String> flags, final boolean nodelay, final String resistor) {
+				final List<String> flags, final String resistor, final Map<String, String> iflags,
+				final Map<String, String> oflags) {
 			super(null, outputs, inputs, flags, Map.of());
 			this.loc = loc;
 			this.resistor = resistor;
-			this.nodelay = new LinkedHashMap<>();
-			if (nodelay)
-				this.nodelay.put("NODELAY", null);
+			this.iflags = iflags;
+			this.oflags = oflags;
 		}
 
 		@Override
@@ -180,7 +196,7 @@ public class PadFactory implements CustomGateFactory {
 			// create suitable IO buffers. if a pin is input-only or output-only, XACTstep
 			// will report that, so no point in detecting that here
 			if (input != null) {
-				final XnfGate gate = xnf.addSymbol("IBUF", nodelay);
+				final XnfGate gate = xnf.addSymbol("IBUF", iflags);
 				gate.connect(PinDirection.CONSUMER, "I", false, ext, null);
 				gate.connect(PinDirection.DRIVER, "O", false, input, null);
 			}
@@ -191,10 +207,10 @@ public class PadFactory implements CustomGateFactory {
 					// emits a warning if tristate ends up being always active, and that warning
 					// could be very confusing if tristate is apparently not even connected in the
 					// original design.
-					obuf = xnf.addSymbol("OBUFT", null);
+					obuf = xnf.addSymbol("OBUFT", oflags);
 					obuf.connect(PinDirection.CONSUMER, "T", false, tristate, null);
 				} else
-					obuf = xnf.addSymbol("OBUF", null);
+					obuf = xnf.addSymbol("OBUF", oflags);
 				obuf.connect(PinDirection.DRIVER, "O", false, ext, null);
 				obuf.connect(PinDirection.CONSUMER, "I", false, output, null);
 			}

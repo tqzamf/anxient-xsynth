@@ -15,7 +15,8 @@ import xsynth.convert.PadFactory.Resistors;
 import xsynth.convert.PadFactory.SlewRateControl;
 
 public class ChipFamily {
-	public static final List<ChipFamily> FAMILIES = List.of(new XC2000Family(), new XC3000Family(), new XC5200Family());
+	public static final List<ChipFamily> FAMILIES = List.of(new XC2000Family(), new XC3000Family(), new XC4000Family(),
+			new XC5200Family());
 
 	protected final Map<String, CustomGateFactory> customGates = new LinkedHashMap<>();
 	protected final Set<String> bufferTypes = new HashSet<>();

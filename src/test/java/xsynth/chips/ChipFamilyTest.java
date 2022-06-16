@@ -21,6 +21,7 @@ public class ChipFamilyTest {
 		assertInstanceOf(XC3000Family.class, ChipFamily.forPart("3195APC84-2"));
 		assertInstanceOf(XC3000Family.class, ChipFamily.forPart("3020"));
 		assertInstanceOf(XC5200Family.class, ChipFamily.forPart("5202PQ100-5"));
+		assertInstanceOf(XC4000Family.class, ChipFamily.forPart("4003PQ100-5"));
 	}
 
 	private void assertInstanceOf(final Class<? extends ChipFamily> clazz, final ChipFamily family) {

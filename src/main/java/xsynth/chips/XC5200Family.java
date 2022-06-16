@@ -19,7 +19,7 @@ public class XC5200Family extends ChipFamily {
 		customGates.put("BSCAN", new SpecialGateFactory( //
 				List.of("RESET", "UPDATE", "SHIFT", "TDO", "DRCK", "IDLE", "SEL1", "SEL2"), //
 				List.of("TDI", "TMS", "TCK", "TDO1", "TDO2"), List.of(), List.of(), //
-				Map.of("TDI", "TDI", "TDO", "TDO", "TMS", "TMS", "TCK", "TCK")));
+				Map.of("TDI", "TDI", "TDO", "TDO", "TMS", "TMS", "TCK", "TCK"), true));
 		customGates.put("RDBK", new ReadbackFactory());
 		customGates.put("STARTUP", new SpecialGateFactory(List.of("Q2", "Q3", "Q1Q4", "DONEIN"), //
 				List.of("GR", "GTS", "CLK"), List.of()));

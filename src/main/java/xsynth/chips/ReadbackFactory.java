@@ -18,7 +18,7 @@ import xsynth.xnf.XnfNetlist;
 public class ReadbackFactory extends SpecialGateFactory {
 	public ReadbackFactory() {
 		super(List.of("DATA", "RIP"), List.of("TRIG", "CLK"), List.of(), List.of(),
-				Map.of("TRIG", "MD0", "DATA", "MD1"));
+				Map.of("TRIG", "MD0", "DATA", "MD1"), false);
 	}
 
 	@Override

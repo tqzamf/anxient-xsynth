@@ -87,6 +87,7 @@ public class ConverterTest {
 				{ "2064pd48-50", "gates2k2", "gates2k" }, //
 				{ "3195apc84-2", "gates3k1", "gates3k1" }, //
 				{ "3195apc84-2", "gates3k2", "gates3k2" }, //
+				{ "4003hpq208-5", "gates4k", "gates4k" }, //
 				{ "5202pq100-5", "gates5k2", "gates5k2" }, //
 				{ "5202pq100-5", "gates5k2rdclk", "gates5k2rdclk" } };
 	}

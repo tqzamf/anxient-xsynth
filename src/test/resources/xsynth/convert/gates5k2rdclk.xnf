@@ -9,8 +9,12 @@ SYM,gates5k2rdclk/RDBK_DATA,RDBK,LIBVER=2.0.0
 PIN,TRIG,I,gates5k2rdclk/trigger
 PIN,DATA,O,gates5k2rdclk/RDBK_DATA
 END
-SYM,gates5k2rdclk/RDBK_DATA/MD1,MD1,LIBVER=2.0.0
+SYM,gates5k2rdclk/RDBK_DATA/PAD/MD1,MD1,LIBVER=2.0.0
+PIN,O,I,gates5k2rdclk/RDBK_DATA/PAD
+END
+SYM,gates5k2rdclk/RDBK_DATA/PAD,OBUF,LIBVER=2.0.0
 PIN,I,I,gates5k2rdclk/RDBK_DATA
+PIN,O,O,gates5k2rdclk/RDBK_DATA/PAD
 END
 SYM,gates5k2rdclk/clock/RDCLK,RDCLK,LIBVER=2.0.0
 PIN,I,I,gates5k2rdclk/clock
